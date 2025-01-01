@@ -1,0 +1,36 @@
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:6-jammy
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - dbdata6:/data/db
+    networks:
+      - app-network
+
+  # Node.js application
+  selfie_be:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: selfie_be
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - JWT_SECRET_KEY=CHIAVE_SEGRETISSIMA
+    networks:
+      - app-network
+
+# Volumi per la persistenza dei dati
+volumes:
+  dbdata6:
+
+# Definisce una rete per i container per poter comunicare tra di loro
+networks:
+  app-network:
+    driver: bridge
