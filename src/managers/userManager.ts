@@ -1,7 +1,7 @@
-import passwordManager from './passwordManager';
-import userRepository from '../repositories/userRepository';
-import { LoginResponse, User, UserSession } from '../types/user';
-import jwtManager from './jwtManager';
+import passwordManager from "./passwordManager";
+import userRepository from "../repositories/userRepository";
+import { LoginResponse, User, UserSession } from "../types/user";
+import jwtManager from "./jwtManager";
 
 class UserManager {
   async insertUser(user: User) {
@@ -30,10 +30,13 @@ class UserManager {
     userID: string;
     password: string;
   }): Promise<LoginResponse | undefined> {
-    const { password, ...user } = (await userRepository.read(
+    const repositoryResult = (await userRepository.read(
       form.userID,
       true
     )) as User;
+    if (!repositoryResult) return undefined;
+    const { password, ...user } = repositoryResult;
+
     if (!user) return undefined;
 
     if (!passwordManager.compare(form.password, password)) return undefined;

@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import express, { Express, Request, Response } from 'express';
 import { User, isValidUser } from './types/user';
 import cors from 'cors';
