@@ -1,21 +1,20 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { User, UserSession } from '../types/user';
-import { NextFunction, Request, Response } from 'express';
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { UserSession } from "../types/user";
+import { Request, Response } from "express";
 
 class JwtManager {
-  private secretKey: string;
+  private readonly secretKey: string;
 
   constructor() {
-    if(!process.env.JWT_SECRET_KEY)
-        throw new Error('No JWT_Secret provided')
-    
+    if (!process.env.JWT_SECRET_KEY) throw new Error("No JWT_Secret provided");
+
     this.secretKey = process.env.JWT_SECRET_KEY;
   }
 
   generateJwt(user: UserSession) {
     return jwt.sign(user, this.secretKey, {
-      expiresIn: '10h',
-      issuer: 'SELFIE_BE',
+      expiresIn: "10h",
+      issuer: "SELFIE_BE",
       subject: user.email,
     });
   }
@@ -41,13 +40,11 @@ class JwtManager {
   }
 }
 
-export const jwtMiddleWare: any = (req: Request, res: Response, next: NextFunction) => {
+export const jwtMiddleWare = async (req: Request, res: Response) => {
   const token = req.headers.authorization;
   if (!token || jwtManager.isExpired(token.substring(7))) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: "Unauthorized" });
   }
-
-  next()
 };
 
 const jwtManager = new JwtManager();

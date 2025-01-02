@@ -1,22 +1,27 @@
-import { Collection, WithId } from 'mongodb';
-import { User, UserSession } from '../types/user';
-import repository from './repository';
+import { Collection } from "mongodb";
+import { User, UserSession } from "../types/user";
+import { Repository } from "./repository";
 
-class UserRepository {
+class UserRepository extends Repository {
   async updatePassword(user: User, newPassword: string): Promise<boolean> {
     return (
       await this.users.updateOne(
         { $or: [{ email: user.email }, { username: user.username }] },
-        {$set: {password: newPassword}}
+        { $set: { password: newPassword } }
       )
     ).acknowledged;
   }
-  private users: Collection;
+  private readonly users: Collection;
 
   constructor() {
-    this.users = repository.client.collection('users',);
-    this.users.createIndex({ email: 1 }, { unique: true });
-    this.users.createIndex({ username: 1 }, { unique: true });
+    super();
+    this.users = this.client.collection("users");
+    this._setup_collection();
+  }
+
+  private async _setup_collection() {
+    await this.users.createIndex({ email: 1 }, { unique: true });
+    await this.users.createIndex({ username: 1 }, { unique: true });
   }
 
   async insert(user: User) {

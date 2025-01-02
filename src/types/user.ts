@@ -16,10 +16,10 @@ export function isValidUser(user: User) {
       if (!user[key as keyof User]) throw key;
     });
 
-    if (!emailRegex.exec(user.email)) throw 'email';
-    if (!phoneNumberRegex.exec(user.phoneNumber)) throw 'phoneNumber';
-    if (!passwordRegex.exec(user.password)) throw 'password';
-    if (user.birthDate > new Date()) throw 'birthDate';
+    if (!emailRegex.exec(user.email)) throw new Error('email');
+    if (!phoneNumberRegex.exec(user.phoneNumber)) throw new Error('phoneNumber');
+    if (!passwordRegex.exec(user.password)) throw new Error('password');
+    if (user.birthDate > new Date()) throw new Error('birthDate');
 
     return true;
   } catch (e: any) {
