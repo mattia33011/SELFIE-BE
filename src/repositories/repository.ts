@@ -12,3 +12,8 @@ export abstract class Repository {
     this.client = client.db("selfie");
   }
 }
+
+
+export enum MongoDBErrorCode {
+  DUPLICATE_KEY = 11000
+}
