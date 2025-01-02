@@ -1,6 +1,8 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { UserSession } from "../types/user";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import { log } from "console";
+import { getSelfieError } from "../types/error";
 
 class JwtManager {
   private readonly secretKey: string;
@@ -21,30 +23,49 @@ class JwtManager {
 
   isExpired(token: string) {
     try {
-      jwt.verify(token, this.secretKey);
-      return false;
+      return jwt.verify(token, this.secretKey) == undefined;
     } catch (e: any) {
+      log(token);
       return true;
     }
   }
 
-  decodeToken(token: string) {
+  decodeToken(token: string): (JwtPayload & UserSession) | undefined {
     try {
-      const decoded = jwt.verify(token, this.secretKey) as JwtPayload &
-        UserSession;
-      console.log(decoded);
-      return decoded;
+      return jwt.verify(token, this.secretKey) as JwtPayload & UserSession;
     } catch (e: any) {
+      console.log(JSON.stringify(e));
       return undefined;
     }
   }
 }
 
-export const jwtMiddleWare = async (req: Request, res: Response) => {
+export const jwtMiddleWare = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.headers.authorization;
+  const error = getSelfieError("NO_AUTH", 401, "The subject is not the requester")
   if (!token || jwtManager.isExpired(token.substring(7))) {
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json(error);
+    return;
   }
+  const decodedToken = jwtManager.decodeToken(
+    req.headers.authorization!.substring(7)
+  );
+  if (
+    decodedToken?.email != req.params.userid &&
+    decodedToken?.username != req.params.userid
+  ) {
+    res
+      .status(401)
+      .json(error);
+    return;
+  }
+
+  req.body = {...req.body, _userSession: decodedToken};
+  next();
 };
 
 const jwtManager = new JwtManager();

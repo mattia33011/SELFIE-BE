@@ -3,20 +3,48 @@ import userRepository from "../repositories/userRepository";
 import { LoginResponse, User, UserSession } from "../types/user";
 import jwtManager from "./jwtManager";
 import { MongoDBErrorCode } from "../repositories/repository";
+import emailManager from "./emailManager";
+import { Recipient } from "mailersend";
+import { log } from "console";
+import crypto from "crypto";
+const generateUnivokeToken = () => crypto.randomBytes(32).toString("hex");
 
 class UserManager {
-  async insertUser(user: User) {
+  async insertUser(user: User, activationToken: string) {
     try {
       await userRepository.insert({
         ...user,
         password: passwordManager.crypt(user.password),
+        activated: false,
+        activationToken: activationToken,
       });
     } catch (e: any) {
-      console.log(JSON.stringify(e.errorResponse));
-      if( e.errorResponse.code == MongoDBErrorCode.DUPLICATE_KEY)
-        throw new Error(Object.keys(e.errorResponse.keyPattern)[0])
-      throw new Error()
+      console.log(JSON.stringify(e));
+      if (e.errorResponse.code == MongoDBErrorCode.DUPLICATE_KEY)
+        throw new Error(Object.keys(e.errorResponse.keyPattern)[0]);
+      throw new Error();
     }
+  }
+  async register(user:User){
+    const activationToken = generateUnivokeToken();
+    await this.insertUser(user, activationToken)
+
+    await this.sendActivationEmail(user,activationToken)
+  }
+  async sendActivationEmail(user: User, activationToken: string) {
+    try {
+      await emailManager.sendActivateAccount(
+        new Recipient(user.email, `${user.firstName} ${user.lastName}`),
+        activationToken
+      );    
+    } catch (e: any) {
+      await this.deleteAccount(user.email);
+      throw new Error();
+    }
+  }
+
+  async deleteAccount(userID: string) {
+    return userRepository.delete(userID);
   }
 
   async resetPassword(form: {

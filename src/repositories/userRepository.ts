@@ -1,5 +1,5 @@
 import { Collection } from "mongodb";
-import { User, UserSession } from "../types/user";
+import { DBUser, User, UserSession } from "../types/user";
 import { Repository } from "./repository";
 
 class UserRepository extends Repository {
@@ -24,10 +24,16 @@ class UserRepository extends Repository {
     await this.users.createIndex({ username: 1 }, { unique: true });
   }
 
-  async insert(user: User) {
+  async insert(user: DBUser) {
     return this.users.insertOne(user);
   }
-
+  async delete(userID: string) {
+    return (
+      await this.users.deleteOne({
+        $or: [{ email: userID }, { username: userID }],
+      })
+    ).deletedCount;
+  }
   async read(
     userID: string,
     showPassword?: boolean
@@ -52,6 +58,9 @@ class UserRepository extends Repository {
           ? (user as User)
           : ({ ...user, password: undefined, _id: undefined } as UserSession)
       );
+  }
+  async activate(token: string){
+    return this.users.updateOne({$and: [{activationToken: token}, {activated: false}]}, {$set: {activated: true}, $unset: {activationToken: ''}}).then(res => res.modifiedCount == 1)
   }
 }
 

@@ -1,10 +1,17 @@
 // Local purposes
-require('dotenv').config();
+require("dotenv").config();
 
-import express, { Express, Request, Response } from 'express';
-import cors from 'cors';
-import { jwtMiddleWare } from './managers/jwtManager';
-import { getUserCallback, loginCallback, registerCallback, resetPasswordCallback } from './callbacks/endpoints';
+import express, { Express, Request, Response } from "express";
+import cors from "cors";
+import { jwtMiddleWare } from "./managers/jwtManager";
+import {
+  activateUserCallback,
+  deleteUserCallback,
+  getUserCallback,
+  loginCallback,
+  registerCallback,
+  resetPasswordCallback,
+} from "./callbacks/endpoints";
 
 const app: Express = express();
 
@@ -17,18 +24,21 @@ app.use(express.urlencoded());
 
 const port = process.env.PORT ?? 3000;
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('SelfieBE is alive!');
+app.get("/", (req: Request, res: Response) => {
+    res.send("SelfieBE is alive!");
 });
 
-app.get('/users/:userid', jwtMiddleWare, getUserCallback);
+app.get("/users/:userid", jwtMiddleWare, getUserCallback);
+app.get("/activate", activateUserCallback);
 
-app.post('/register', registerCallback);
+app.delete("/users/:userid", jwtMiddleWare, deleteUserCallback);
 
-app.post('/login', loginCallback);
+app.post("/register", registerCallback);
 
-app.patch('/reset-password', resetPasswordCallback);
+app.post("/login", loginCallback);
+
+app.patch("/reset-password", resetPasswordCallback);
 
 app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+    console.log(`[server]: Server is running at http://localhost${port}`);
 });

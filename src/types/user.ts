@@ -9,6 +9,8 @@ export type User = {
   phoneNumber: string;
   password: string;
 };
+
+export type DBUser = User & {activated: boolean, activationToken?: string}
 export function isValidUser(user: User) {
   try {
     // Check if something is undefined
