@@ -25,7 +25,6 @@ class JwtManager {
     try {
       return jwt.verify(token, this.secretKey) == undefined;
     } catch (e: any) {
-      log(token);
       return true;
     }
   }
@@ -39,34 +38,6 @@ class JwtManager {
     }
   }
 }
-
-export const jwtMiddleWare = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const token = req.headers.authorization;
-  const error = getSelfieError("NO_AUTH", 401, "The subject is not the requester")
-  if (!token || jwtManager.isExpired(token.substring(7))) {
-    res.status(401).json(error);
-    return;
-  }
-  const decodedToken = jwtManager.decodeToken(
-    req.headers.authorization!.substring(7)
-  );
-  if (
-    decodedToken?.email != req.params.userid &&
-    decodedToken?.username != req.params.userid
-  ) {
-    res
-      .status(401)
-      .json(error);
-    return;
-  }
-
-  req.body = {...req.body, _userSession: decodedToken};
-  next();
-};
 
 const jwtManager = new JwtManager();
 export default jwtManager;

@@ -41,7 +41,7 @@ class UserRepository extends Repository {
     return this.users
       .findOne(
         {
-          $or: [{ email: userID }, { username: userID }],
+          $or: [{ email: userID }, { username: userID }],$and: [{activated: true}],
         },
         {
           showRecordId: false,
@@ -56,7 +56,7 @@ class UserRepository extends Repository {
       .then((user: any) =>
         showPassword
           ? (user as User)
-          : ({ ...user, password: undefined, _id: undefined } as UserSession)
+          : ({ ...user, password: undefined, _id: undefined, activated: undefined } as UserSession)
       );
   }
   async activate(token: string){
