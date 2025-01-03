@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from "express";
+import { RequestHandler } from "express";
 import userManager from "../managers/userManager";
 import { User, isValidUser } from "../types/user";
 import { getSelfieError } from "../types/error";

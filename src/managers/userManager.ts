@@ -5,7 +5,6 @@ import jwtManager from "./jwtManager";
 import { MongoDBErrorCode } from "../repositories/repository";
 import emailManager from "./emailManager";
 import { Recipient } from "mailersend";
-import { log } from "console";
 import crypto from "crypto";
 const generateUnivokeToken = () => crypto.randomBytes(32).toString("hex");
 

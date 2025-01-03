@@ -1,8 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { UserSession } from "../types/user";
-import { NextFunction, Request, Response } from "express";
-import { log } from "console";
-import { getSelfieError } from "../types/error";
 
 class JwtManager {
   private readonly secretKey: string;

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 
 class PasswordManager {
-  private _salt = "$2b$10$mUicp4MD8h3h5HUnjQ.tWO"
+  private readonly _salt = "$2b$10$mUicp4MD8h3h5HUnjQ.tWO"
 
   crypt(password: string): string {
     return bcrypt.hashSync(password, this._salt);

@@ -3,8 +3,8 @@ import pino from "pino";
 import { getSelfieError } from "../types/error";
 import jwtManager from "../managers/jwtManager";
 import { SelfieError } from "../../src/types/error";
-import { log } from "console";
-export const logger = pino();
+
+const logger = pino();
 
 // Middleware handle error
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
