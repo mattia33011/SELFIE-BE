@@ -1,11 +1,12 @@
 import passwordManager from "./passwordManager";
 import userRepository from "../repositories/userRepository";
-import { LoginResponse, User, UserSession } from "../types/user";
+import { DBUser, LoginResponse, User, UserSession } from "../types/user";
 import jwtManager from "./jwtManager";
 import { MongoDBErrorCode } from "../repositories/repository";
 import emailManager from "./emailManager";
 import { Recipient } from "mailersend";
 import crypto from "crypto";
+import fileManager from "./fileManager";
 const generateUnivokeToken = () => crypto.randomBytes(32).toString("hex");
 
 class UserManager {
@@ -43,7 +44,11 @@ class UserManager {
   }
 
   async deleteAccount(userID: string) {
-    return userRepository.delete(userID);
+    const user = await userRepository.read(userID, false, true) as DBUser
+    if(user.imagePath && !(await fileManager.deleteFile(user.imagePath)))
+      return false;
+
+    return userRepository.delete(userID).then(deletedCount => deletedCount == 1);
   }
 
   async resetPassword(form: {
@@ -85,6 +90,14 @@ class UserManager {
   }
   async readUser(userID: string): Promise<UserSession | undefined> {
     return (await userRepository.read(userID)) as UserSession;
+  }
+
+  async getUserProfilePicture(userID: string){
+    const user = await userRepository.read(userID,false,true) as DBUser
+    if(!user || !user.imagePath)
+      return undefined
+    
+    return await fileManager.getFile(user.imagePath)
   }
 }
 const userManager = new UserManager();

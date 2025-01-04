@@ -3,6 +3,7 @@ import pino from "pino";
 import { getSelfieError } from "../types/error";
 import jwtManager from "../managers/jwtManager";
 import { SelfieError } from "../../src/types/error";
+import { log } from "console";
 
 const logger = pino();
 
@@ -10,25 +11,32 @@ const logger = pino();
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof SelfieError) {
     logger.error(
-      `Error: ${JSON.stringify(err.error)} - Status: ${err.status} - Request: ${req.originalUrl}`
+      `Error: ${JSON.stringify(err.error)} - Status: ${err.status} - Request: ${
+        req.originalUrl
+      }`
     );
     res.status(err.status).json(err);
   } else {
-    console.log('ciao')
+    console.log(JSON.stringify(err));
     logger.error(
       err,
       `INTERNAL SERVER ERROR - Status: 500 - Request: ${req.originalUrl}`
     );
-    res.status(500).json(getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR"));
+    res
+      .status(500)
+      .json(
+        getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR")
+      );
   }
 };
 
 export const logRequest: RequestHandler = (req, res, next) => {
   // Esegui qualsiasi operazione prima di passare al prossimo middleware
-  res.on("finish", () => {
+  const logRequ = () => {
     if (res.statusCode == 200)
       logger.info(`Request ${req.originalUrl} handled`);
-  });
+  };
+  res.on("finish", logRequ);
   next();
 };
 
@@ -49,6 +57,7 @@ export const jwtMiddleWare: RequestHandler = async (req, res, next) => {
     req.headers.authorization!.substring(7)
   );
   if (
+    req.params.userid &&
     decodedToken?.email != req.params.userid &&
     decodedToken?.username != req.params.userid
   ) {

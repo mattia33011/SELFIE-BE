@@ -1,4 +1,4 @@
-import { Collection } from "mongodb";
+import { Collection, ObjectId } from "mongodb";
 import { DBUser, User, UserSession } from "../types/user";
 import { Repository } from "./repository";
 
@@ -24,7 +24,7 @@ class UserRepository extends Repository {
     await this.users.createIndex({ username: 1 }, { unique: true });
   }
 
-  async insert(user: DBUser) {
+  async insert(user: Omit<DBUser, "_id">) {
     return this.users.insertOne(user);
   }
   async delete(userID: string) {
@@ -36,31 +36,58 @@ class UserRepository extends Repository {
   }
   async read(
     userID: string,
-    showPassword?: boolean
-  ): Promise<User | UserSession | undefined> {
+    showPassword?: boolean,
+    showAsDB?: boolean
+  ): Promise<User | UserSession | DBUser | undefined> {
     return this.users
       .findOne(
         {
-          $or: [{ email: userID }, { username: userID }],$and: [{activated: true}],
+          $or: [{ email: userID }, { username: userID }],
+          $and: [{ activated: true }],
         },
         {
           showRecordId: false,
-          projection: showPassword
-            ? { _id: 0 }
+          projection: showAsDB
+            ? undefined
+            : showPassword
+            ? { _id: 0, activated: 0, imagePath: 0 }
             : {
+                imagePath: 0,
                 password: 0,
+                activated: 0,
                 _id: 0,
               },
         }
       )
       .then((user: any) =>
-        showPassword
+        showAsDB
+          ? (user as DBUser)
+          : showPassword
           ? (user as User)
-          : ({ ...user, password: undefined, _id: undefined, activated: undefined } as UserSession)
+          : ({
+              ...user,
+              password: undefined,
+              _id: undefined,
+              activated: undefined,
+            } as UserSession)
       );
   }
-  async activate(token: string){
-    return this.users.updateOne({$and: [{activationToken: token}, {activated: false}]}, {$set: {activated: true}, $unset: {activationToken: ''}}).then(res => res.modifiedCount == 1)
+  async activate(token: string) {
+    return this.users
+      .updateOne(
+        { $and: [{ activationToken: token }, { activated: false }] },
+        { $set: { activated: true }, $unset: { activationToken: "" } }
+      )
+      .then((res) => res.modifiedCount == 1);
+  }
+
+  async putProfilePicture(userID: string, filename: string) {
+    return this.users
+      .updateOne(
+        { $or: [{ email: userID }, { username: userID }] },
+        { $set: { imagePath: filename } }
+      )
+      .then((res) => res.modifiedCount == 1);
   }
 }
 

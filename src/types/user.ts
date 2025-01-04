@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type UserSession = Omit<User, 'password'>;
 
 export type User = {
@@ -10,7 +12,7 @@ export type User = {
   password: string;
 };
 
-export type DBUser = User & {activated: boolean, activationToken?: string}
+export type DBUser = User & {_id: ObjectId, activated: boolean, activationToken?: string, imagePath?: string}
 export function isValidUser(user: User) {
   try {
     // Check if something is undefined

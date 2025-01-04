@@ -10,12 +10,15 @@ import cors from "cors";
 import {
   activateUserCallback,
   deleteUserCallback,
+  getProfilePictureCallback,
   getUserCallback,
   loginCallback,
+  profilePictureUploadMiddleware,
   registerCallback,
   resetPasswordCallback,
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
+import fileManager from "./managers/fileManager";
 
 const app: Express = express();
 
@@ -26,6 +29,8 @@ app.use(express.json());
 //URL encoded parser
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware to log Request
+app.use(logRequest);
 
 const port = process.env.PORT ?? 3000;
 
@@ -45,9 +50,10 @@ app.post("/login", loginCallback);
 
 app.patch("/reset-password", resetPasswordCallback);
 
+app.put('/users/:userid/profile-picture', jwtMiddleWare, fileManager.uploadMiddleware.single('file'), profilePictureUploadMiddleware)
 
-// Middleware to log Request
-app.use(logRequest);
+app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallback)
+
 // Middleware to catch every unhandled error
 app.use(errorHandler);
 

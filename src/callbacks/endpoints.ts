@@ -3,6 +3,9 @@ import userManager from "../managers/userManager";
 import { User, isValidUser } from "../types/user";
 import { getSelfieError } from "../types/error";
 import userRepository from "../repositories/userRepository";
+import { File } from "aws-sdk/clients/apptest";
+import { log } from "console";
+import { Readable } from "stream";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -72,3 +75,48 @@ export const deleteUserCallback: RequestHandler = async (req, res, next) => {
 
   res.status(200).send("");
 };
+
+export const profilePictureUploadMiddleware: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  if (!req.file) {
+    return next(getSelfieError("USE_003", 400, "File not uploaded"));
+  }
+
+  res.status(200).json({
+    message: "File uploaded successfully",
+  });
+};
+
+export const getProfilePictureCallback: RequestHandler = async (req, res, next) => {
+  const userid = req.params.userid
+  if(!userid)
+    return next(getSelfieError('USE_001', 400, 'provide user id'))
+  
+  const data = await userManager.getUserProfilePicture(userid)
+  if(!data)
+    return next(getSelfieError('USE_004', 404, 'User does not have a profile picture'))
+
+  res.setHeader('Content-Type', data.ContentType ?? 'application/octet-stream');
+// Imposta l'intestazione Content-Disposition
+res.setHeader('Content-Disposition', `inline; filename="${userid}"`);
+
+  const fileStream = data.Body! as Readable; // Questo è un flusso di lettura
+  
+  fileStream.on('data', chunk => {
+    res.write(chunk);  // Scrivi ogni chunk nel corpo della risposta
+  });
+
+  // Quando il flusso è finito, chiudi la risposta
+  fileStream.on('end', () => {
+    res.end().status(200);
+  });
+
+  // Gestisci eventuali errori nel flusso
+  fileStream.on('error', (err) => {
+    console.error('Errore nel flusso di dati:', err);
+    res.status(500).send('Errore nel recupero del file');
+  });
+}
