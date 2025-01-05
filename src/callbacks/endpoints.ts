@@ -1,11 +1,9 @@
 import { RequestHandler } from "express";
 import userManager from "../managers/userManager";
-import { User, isValidUser } from "../types/user";
-import { getSelfieError } from "../types/error";
 import userRepository from "../repositories/userRepository";
-import { File } from "aws-sdk/clients/apptest";
-import { log } from "console";
 import { Readable } from "stream";
+import { getSelfieError } from "../types/error";
+import { User, isValidUser } from "../types/user";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;

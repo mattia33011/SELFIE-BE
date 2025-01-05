@@ -9,9 +9,7 @@ import {
 import { Request } from "express";
 import userRepository from "../repositories/userRepository";
 import { DBUser } from "../types/user";
-import { getSelfieError } from "../types/error";
 import path from "path";
-import { log } from "console";
 
 class FileManager {
   private readonly s3: S3Client;
