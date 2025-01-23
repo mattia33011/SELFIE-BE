@@ -4,6 +4,7 @@ import userRepository from "../repositories/userRepository";
 import { Readable } from "stream";
 import { getSelfieError } from "../types/error";
 import { User, isValidUser } from "../types/user";
+import { log } from "console";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -38,6 +39,7 @@ export const registerCallback: RequestHandler = async (req, res, next) => {
     await userManager.register(body);
     res.status(200).send("");
   } catch (e: any) {
+    log(JSON.stringify(e))
     next(getSelfieError("RE_002", 400, "user already exists", e.message));
   }
 };

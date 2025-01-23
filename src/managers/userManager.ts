@@ -15,22 +15,25 @@ class UserManager {
       await userRepository.insert({
         ...user,
         password: passwordManager.crypt(user.password),
-        activated: false,
-        activationToken: activationToken,
+        activated: true,
+        activationToken: activationToken, //Unused 
+        imagePath: ''
       });
     } catch (e: any) {
       console.log(JSON.stringify(e));
       if (e.errorResponse.code == MongoDBErrorCode.DUPLICATE_KEY)
         throw new Error(Object.keys(e.errorResponse.keyPattern)[0]);
-      throw new Error();
+      
+      throw e;
     }
   }
   async register(user:User){
     const activationToken = generateUnivokeToken();
     await this.insertUser(user, activationToken)
-
-    await this.sendActivationEmail(user,activationToken)
+    
+    //await this.sendActivationEmail(user,activationToken)
   }
+  // Unused
   async sendActivationEmail(user: User, activationToken: string) {
     try {
       await emailManager.sendActivateAccount(
@@ -39,7 +42,7 @@ class UserManager {
       );    
     } catch (e: any) {
       await this.deleteAccount(user.email);
-      throw new Error();
+      throw e;
     }
   }
 
