@@ -1,10 +1,9 @@
 import { RequestHandler } from "express";
 import userManager from "../managers/userManager";
 import userRepository from "../repositories/userRepository";
-import { Readable } from "stream";
-import { getSelfieError } from "../types/error";
 import { User, isValidUser } from "../types/user";
 import { log } from "console";
+import { getSelfieError } from "../types/errors";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -39,7 +38,7 @@ export const registerCallback: RequestHandler = async (req, res, next) => {
     await userManager.register(body);
     res.status(200).send("");
   } catch (e: any) {
-    log(JSON.stringify(e))
+    log(JSON.stringify(e));
     next(getSelfieError("RE_002", 400, "user already exists", e.message));
   }
 };
@@ -84,39 +83,40 @@ export const profilePictureUploadMiddleware: RequestHandler = async (
   if (!req.file) {
     return next(getSelfieError("USE_003", 400, "File not uploaded"));
   }
+  //@ts-ignore
+  if (!req?.user?.username && !req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+    const { username, email } = req?.user;
+    try{
+    userManager.putProfilePicture(username ?? email, req.file);
+  }
+  catch(e: any){
+    return next(e)
+  }
 
   res.status(200).json({
     message: "File uploaded successfully",
   });
 };
 
-export const getProfilePictureCallback: RequestHandler = async (req, res, next) => {
-  const userid = req.params.userid
-  if(!userid)
-    return next(getSelfieError('USE_001', 400, 'provide user id'))
-  
-  const data = await userManager.getUserProfilePicture(userid)
-  if(!data)
-    return next(getSelfieError('USE_004', 404, 'User does not have a profile picture'))
+export const getProfilePictureCallback: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const userid = req.params.userid;
+  if (!userid) return next(getSelfieError("USE_001", 400, "provide user id"));
 
-  res.setHeader('Content-Type', data.ContentType ?? 'application/octet-stream');
-// Imposta l'intestazione Content-Disposition
-res.setHeader('Content-Disposition', `inline; filename="${userid}"`);
+  const data = await userManager.getUserProfilePicture(userid);
+  if (!data)
+    return next(
+      getSelfieError("USE_004", 404, "User does not have a profile picture")
+    );
 
-  const fileStream = data.Body! as Readable; // Questo è un flusso di lettura
-  
-  fileStream.on('data', chunk => {
-    res.write(chunk);  // Scrivi ogni chunk nel corpo della risposta
+  res.writeHead(200, {
+    "Content-Type": "application/octet-stream",
   });
-
-  // Quando il flusso è finito, chiudi la risposta
-  fileStream.on('end', () => {
-    res.end().status(200);
-  });
-
-  // Gestisci eventuali errori nel flusso
-  fileStream.on('error', (err) => {
-    console.error('Errore nel flusso di dati:', err);
-    res.status(500).send('Errore nel recupero del file');
-  });
-}
+  res.write(data.buffer);
+  res.end();
+};

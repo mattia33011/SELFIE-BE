@@ -18,9 +18,11 @@ import {
   resetPasswordCallback,
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
-import fileManager from "./managers/fileManager";
+import multer from "multer";
 
 const app: Express = express();
+
+const multerMiddleware = multer();
 
 //Enable CORS (Cross ORigin Site)
 app.use(cors());
@@ -50,7 +52,7 @@ app.post("/login", loginCallback);
 
 app.patch("/reset-password", resetPasswordCallback);
 
-app.put('/users/:userid/profile-picture', jwtMiddleWare, fileManager.uploadMiddleware.single('file'), profilePictureUploadMiddleware)
+app.put('/users/:userid/profile-picture', jwtMiddleWare, multerMiddleware.single('file'), profilePictureUploadMiddleware)
 
 app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallback)
 

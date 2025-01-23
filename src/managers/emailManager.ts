@@ -1,3 +1,4 @@
+// class unused
 import { EmailParams, MailerSend, Recipient, Sender } from "mailersend";
 import { Personalization } from "mailersend/lib/modules/Email.module";
 

@@ -14,4 +14,3 @@ export class SelfieError extends Error {
 }
 
 export const getSelfieError = (code: string, status: number, error: string, context? : Record<string, any>) => new SelfieError(code, status, error, context)
-

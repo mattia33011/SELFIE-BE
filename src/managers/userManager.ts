@@ -6,7 +6,9 @@ import { MongoDBErrorCode } from "../repositories/repository";
 import emailManager from "./emailManager";
 import { Recipient } from "mailersend";
 import crypto from "crypto";
-import fileManager from "./fileManager";
+import { Binary } from "mongodb";
+import { getSelfieError } from "../types/errors";
+
 const generateUnivokeToken = () => crypto.randomBytes(32).toString("hex");
 
 class UserManager {
@@ -16,21 +18,20 @@ class UserManager {
         ...user,
         password: passwordManager.crypt(user.password),
         activated: true,
-        activationToken: activationToken, //Unused 
-        imagePath: ''
+        activationToken: activationToken, //Unused
       });
     } catch (e: any) {
       console.log(JSON.stringify(e));
       if (e.errorResponse.code == MongoDBErrorCode.DUPLICATE_KEY)
         throw new Error(Object.keys(e.errorResponse.keyPattern)[0]);
-      
+
       throw e;
     }
   }
-  async register(user:User){
+  async register(user: User) {
     const activationToken = generateUnivokeToken();
-    await this.insertUser(user, activationToken)
-    
+    await this.insertUser(user, activationToken);
+
     //await this.sendActivationEmail(user,activationToken)
   }
   // Unused
@@ -39,7 +40,7 @@ class UserManager {
       await emailManager.sendActivateAccount(
         new Recipient(user.email, `${user.firstName} ${user.lastName}`),
         activationToken
-      );    
+      );
     } catch (e: any) {
       await this.deleteAccount(user.email);
       throw e;
@@ -47,11 +48,14 @@ class UserManager {
   }
 
   async deleteAccount(userID: string) {
-    const user = await userRepository.read(userID, false, true) as DBUser
-    if(user.imagePath && !(await fileManager.deleteFile(user.imagePath)))
-      return false;
+    const user = (await userRepository.read(userID, false, true)) as DBUser;
+    //TODO
 
-    return userRepository.delete(userID).then(deletedCount => deletedCount == 1);
+    //if (user.imagePath) return false;
+
+    return userRepository
+      .delete(userID)
+      .then((deletedCount) => deletedCount == 1);
   }
 
   async resetPassword(form: {
@@ -95,12 +99,30 @@ class UserManager {
     return (await userRepository.read(userID)) as UserSession;
   }
 
-  async getUserProfilePicture(userID: string){
-    const user = await userRepository.read(userID,false,true) as DBUser
-    if(!user || !user.imagePath)
-      return undefined
-    
-    return await fileManager.getFile(user.imagePath)
+  async putProfilePicture(
+    userID: string,
+    file: {
+      size: number;
+      fieldname: string;
+      originalname: string;
+      encoding: string;
+      mimetype: string;
+      buffer: any;
+    }
+  ) {
+    if (file.size > 1000000)
+      throw getSelfieError("F_001", 400, "File is too big");
+    try {
+      const binary = new Binary(file.buffer);
+      userRepository.putProfilePicture(userID, binary);
+    } catch (e: any) {
+      throw getSelfieError("F_000", 500, "Error uploading file");
+    }
+  }
+
+  async getUserProfilePicture(userID: string) {
+    const user = (await userRepository.read(userID, false, true)) as DBUser;
+    return user.profilePicture;
   }
 }
 const userManager = new UserManager();

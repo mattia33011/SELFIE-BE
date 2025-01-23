@@ -1,8 +1,7 @@
 import { ErrorRequestHandler, RequestHandler } from "express";
 import pino from "pino";
-import { getSelfieError } from "../types/error";
 import jwtManager from "../managers/jwtManager";
-import { SelfieError } from "../types/error";
+import { SelfieError, getSelfieError } from "../types/errors";
 
 const logger = pino();
 
@@ -66,6 +65,8 @@ export const jwtMiddleWare: RequestHandler = async (req, res, next) => {
     res.status(401).json(error);
     return;
   }
+  //@ts-ignore
+  req.user = decodedToken //add custom attribute 
 
   req.body = { ...req.body, _userSession: decodedToken };
   next();

@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Binary, ObjectId } from "mongodb";
 
 export type UserSession = Omit<User, 'password'>;
 
@@ -12,7 +12,7 @@ export type User = {
   password: string;
 };
 
-export type DBUser = User & {_id: ObjectId, activated: boolean, activationToken?: string, imagePath?: string}
+export type DBUser = User & {_id: ObjectId, activated: boolean, activationToken?: string, profilePicture?: Binary}
 export function isValidUser(user: User) {
   try {
     // Check if something is undefined
@@ -40,3 +40,6 @@ export const phoneNumberRegex =
   /^[\+]?[0-9]{0,3}\W?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
 export const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])(?=.{8,})/;
+
+
+  

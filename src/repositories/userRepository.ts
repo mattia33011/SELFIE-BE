@@ -1,4 +1,4 @@
-import { Collection, ObjectId } from "mongodb";
+import { Binary, Collection, ObjectId } from "mongodb";
 import { DBUser, User, UserSession } from "../types/user";
 import { Repository } from "./repository";
 
@@ -81,13 +81,14 @@ class UserRepository extends Repository {
       .then((res) => res.modifiedCount == 1);
   }
 
-  async putProfilePicture(userID: string, filename: string) {
-    return this.users
-      .updateOne(
-        { $or: [{ email: userID }, { username: userID }] },
-        { $set: { imagePath: filename } }
-      )
-      .then((res) => res.modifiedCount == 1);
+  async getProfilePicture(userID: string){
+    this.read(userID)
+  }
+  async putProfilePicture(userId: string, bufferData: Binary) {
+    return this.users.updateOne(
+      { $or: [{ email: userId }, { username: userId }] },
+      { $set: {profilePicture: bufferData} }
+    );
   }
 }
 
