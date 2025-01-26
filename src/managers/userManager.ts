@@ -82,8 +82,8 @@ class UserManager {
       true
     )) as User;
     if (!repositoryResult) return undefined;
-    const { password, ...user } = repositoryResult;
-
+    const {firstName, lastName, birthDate, email, username, phoneNumber, password } = repositoryResult;
+    const user = {firstName, lastName, birthDate, email, username, phoneNumber}
     if (!user) return undefined;
 
     if (!passwordManager.compare(form.password, password)) return undefined;

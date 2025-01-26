@@ -24,6 +24,7 @@ const app: Express = express();
 
 const multerMiddleware = multer();
 
+
 //Enable CORS (Cross ORigin Site)
 app.use(cors());
 //Body parser JSON
