@@ -6,7 +6,7 @@ import { SelfieError, getSelfieError } from "../types/errors";
 const logger = pino();
 
 // Middleware handle error
-export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res) => {
   if (err instanceof SelfieError) {
     logger.error(
       `Error: ${JSON.stringify(err.error)} - Status: ${err.status} - Request: ${
@@ -68,6 +68,6 @@ export const jwtMiddleWare: RequestHandler = async (req, res, next) => {
   //@ts-ignore
   req.user = decodedToken //add custom attribute 
 
-  req.body = { ...req.body, _userSession: decodedToken };
+  req.body = { ...req.body };
   next();
 };

@@ -1,4 +1,4 @@
-import { Binary, Collection, ObjectId } from "mongodb";
+import { Binary, Collection } from "mongodb";
 import { DBUser, User, UserSession } from "../types/user";
 import { Repository } from "./repository";
 
@@ -14,8 +14,8 @@ class UserRepository extends Repository {
   private readonly users: Collection;
 
   constructor() {
-    super();
-    this.users = this.client.collection("users");
+    super("users");
+    this.users = this.collection;
     this._setup_collection();
   }
 

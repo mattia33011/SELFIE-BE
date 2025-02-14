@@ -4,6 +4,9 @@ import userRepository from "../repositories/userRepository";
 import { User, isValidUser } from "../types/user";
 import { log } from "console";
 import { getSelfieError } from "../types/errors";
+import {noteManager} from "../managers/noteManager";
+import {eventManager} from "../managers/eventManager";
+import {isEvent, isNote} from "../types/event";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -120,3 +123,102 @@ export const getProfilePictureCallback: RequestHandler = async (
   res.write(data.buffer);
   res.end();
 };
+
+
+export const getNotesCallback: RequestHandler = async (
+    req,
+    res,
+    next
+) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+
+  //@ts-ignore
+  const { email } = req?.user;
+  const dateFilter = req.query.dateFilter ? new Date(req.query.dateFilter as string) : undefined;
+  try{
+    const data = await noteManager.fetchNotes(email,dateFilter)
+    res.status(200).json(data);
+  }
+  catch(e: any){
+    return next(getSelfieError("NOTE_001", 404, "Notes not found"))
+  }
+}
+
+export const postNotesCallback: RequestHandler = async (
+    req,
+    res,
+    next
+) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+
+  const body = req.body
+  if(!isNote(body))
+    return next(getSelfieError("NOTE_002", 400, "Body is invalid"))
+
+  try{
+    const data = await noteManager.insert(body, email,)
+
+    if(!data){
+      return next(getSelfieError("NOTE_003", 500, "ops, there was an error, try later"));
+    }
+
+    res.status(200).json(data);
+  }
+  catch(e: any){
+    return next(getSelfieError("NOTE_003", 500, "ops, there was an error, try later"));
+  }
+}
+
+export const getEventsCallback: RequestHandler = async (
+    req,
+    res,
+    next
+) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+  try{
+    const data = await eventManager.fetchNotes(email)
+    res.status(200).json(data);
+  }
+  catch(e: any){
+    return next(getSelfieError("EVENT_001", 404, "Events not found"))
+  }
+}
+
+export const postEventsCallback: RequestHandler = async (
+    req,
+    res,
+    next
+) => {
+//@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+
+  const body = req.body
+  if(!isEvent(body))
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid"))
+
+  try{
+    const data = await eventManager.insert(body, email,)
+
+    if(!data){
+      return next(getSelfieError("EVENT_003", 500, "ops, there was an error, try later"));
+    }
+
+    res.status(200).json(data);
+  }
+  catch(e: any){
+    return next(getSelfieError("EVENT_003", 500, "ops, there was an error, try later"));
+  }
+}

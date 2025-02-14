@@ -16,6 +16,10 @@ import {
   profilePictureUploadMiddleware,
   registerCallback,
   resetPasswordCallback,
+  getNotesCallback,
+  postNotesCallback,
+  getEventsCallback,
+  postEventsCallback
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -56,6 +60,12 @@ app.patch("/reset-password", resetPasswordCallback);
 app.put('/users/:userid/profile-picture', jwtMiddleWare, multerMiddleware.single('file'), profilePictureUploadMiddleware)
 
 app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallback)
+
+app.get('/users/:userid/notes', jwtMiddleWare, getNotesCallback)
+app.post('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
+
+app.get('/users/:userid/events', jwtMiddleWare, getEventsCallback)
+app.post('/users/:userid/events', jwtMiddleWare, postEventsCallback)
 
 // Middleware to catch every unhandled error
 app.use(errorHandler);
