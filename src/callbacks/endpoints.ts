@@ -2,7 +2,6 @@ import { RequestHandler } from "express";
 import userManager from "../managers/userManager";
 import userRepository from "../repositories/userRepository";
 import { User, isValidUser } from "../types/user";
-import { log } from "console";
 import { getSelfieError } from "../types/errors";
 import {noteManager} from "../managers/noteManager";
 import {eventManager} from "../managers/eventManager";
@@ -41,7 +40,6 @@ export const registerCallback: RequestHandler = async (req, res, next) => {
     await userManager.register(body);
     res.status(200).send("");
   } catch (e: any) {
-    log(JSON.stringify(e));
     next(getSelfieError("RE_002", 400, "user already exists", e.message));
   }
 };

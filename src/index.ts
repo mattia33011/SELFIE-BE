@@ -1,6 +1,7 @@
 // Local purposes
 require("dotenv").config();
 
+import {checkDbConnection} from "./repositories/repository";
 import express, {
   Express,
   Request,
@@ -70,6 +71,15 @@ app.post('/users/:userid/events', jwtMiddleWare, postEventsCallback)
 // Middleware to catch every unhandled error
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost${port}`);
-});
+checkDbConnection().then(it => {
+  if(!it){
+    throw new Error("MongoDB connection refused");
+  }
+
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost${port}`);
+  })
+
+})
+
+
