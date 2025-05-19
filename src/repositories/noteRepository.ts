@@ -22,6 +22,9 @@ class NoteRepository extends Repository {
     async updateNote(noteID: ObjectId, note: Note) {
         return this.events.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: new Date()}});
     }
+    async readRecentNote(userID: string) {
+        return this.events.find({userID: userID}).sort({lastEdit: -1}).limit(5).toArray();
+    }
 }
 
 const noteRepository = new NoteRepository()

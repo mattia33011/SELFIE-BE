@@ -20,7 +20,15 @@ import {
   getNotesCallback,
   postNotesCallback,
   getEventsCallback,
-  postEventsCallback
+  postEventsCallback,
+  getPomodoroCallback,
+  postPomodoroCallback,
+  getRecentNotesCallback,
+  postRecentNotesCallback,
+  getTasksCallback,
+  postTasksCallback,
+  getSessionsCallback,
+  postSessionsCallback,
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -62,9 +70,27 @@ app.put('/users/:userid/profile-picture', jwtMiddleWare, multerMiddleware.single
 
 app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallback)
 
-app.get('/users/:userid/notes', jwtMiddleWare, getNotesCallback)
+//NOTES
+app.get('/users/:userid/notes', jwtMiddleWare, getNotesCallback);
 app.post('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
+//recent notes
+app.get('/users/:userid/notes/recent', jwtMiddleWare, getRecentNotesCallback);
+app.post('/users/:userid/notes/recent', jwtMiddleWare, postRecentNotesCallback);
 
+//POMODORO
+app.get('/users/:userid/pomodoro', jwtMiddleWare, getPomodoroCallback);
+app.post('/users/:userid/pomodoro', jwtMiddleWare, postPomodoroCallback);
+
+//sessioni passate
+app.get('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, getSessionsCallback);
+app.post('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, postSessionsCallback);
+
+//tasks
+app.get('/users/:userid/pomodoro/tasks', jwtMiddleWare, getTasksCallback);
+app.post('/users/:userid/pomodoro/tasks', jwtMiddleWare, postTasksCallback);
+
+
+//EVENTS
 app.get('/users/:userid/events', jwtMiddleWare, getEventsCallback)
 app.post('/users/:userid/events', jwtMiddleWare, postEventsCallback)
 
