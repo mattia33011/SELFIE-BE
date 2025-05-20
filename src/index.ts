@@ -73,6 +73,8 @@ app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallba
 //NOTES
 app.get('/users/:userid/notes', jwtMiddleWare, getNotesCallback);
 app.post('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
+app.delete('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
+
 //recent notes
 app.get('/users/:userid/notes/recent', jwtMiddleWare, getRecentNotesCallback);
 app.post('/users/:userid/notes/recent', jwtMiddleWare, postRecentNotesCallback);

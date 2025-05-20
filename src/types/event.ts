@@ -14,11 +14,13 @@ export type Notes = Note[]
 export type Note = {
     label: string,
     expanded: Boolean,
+    content: string,
     icon: String,
     children: any[],
     type: string,
     parent: string,
     droppable: Boolean,
+    lastEdit: Date,
 }
 
 export type Pomodoro = {

@@ -3,6 +3,11 @@ import {Collection, ObjectId} from "mongodb";
 import {Note} from "../types/event";
 
 class NoteRepository extends Repository {
+    delete(noteID: string, userID: string) {
+        return this.events.deleteOne({
+            $and: [{_id: new ObjectId(noteID)}, {userID: userID}] 
+        })
+    }
     private readonly events: Collection;
 
     constructor() {
