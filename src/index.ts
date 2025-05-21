@@ -27,8 +27,9 @@ import {
   postRecentNotesCallback,
   getTasksCallback,
   postTasksCallback,
-  getSessionsCallback,
-  postSessionsCallback,
+  getStudySessionsCallback,
+  postStudySessionsCallback,
+  deleteStudySessionsCallback
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -84,8 +85,9 @@ app.get('/users/:userid/pomodoro', jwtMiddleWare, getPomodoroCallback);
 app.post('/users/:userid/pomodoro', jwtMiddleWare, postPomodoroCallback);
 
 //sessioni passate
-app.get('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, getSessionsCallback);
-app.post('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, postSessionsCallback);
+app.get('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, getStudySessionsCallback);
+app.post('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, postStudySessionsCallback);
+app.delete('/users/:userid/pomodoro/oldSessions/:sessionid', jwtMiddleWare, deleteStudySessionsCallback);
 
 //tasks
 app.get('/users/:userid/pomodoro/tasks', jwtMiddleWare, getTasksCallback);

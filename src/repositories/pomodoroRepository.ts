@@ -30,11 +30,18 @@ class PomodoroRepository extends Repository {
         return this.sessions.find({userID: userID}).toArray();
     }
 
+    async deleteSession(sessionID: string, userID: string) {
+        return this.sessions.deleteOne({ _id: new ObjectId(sessionID), userID: userID });
+    }
+
     async readTask(userID: string) {
         return this.tasks.find({userID: userID}).toArray();
     }
     async saveTask(task: Task, userID: string) {
         return this.tasks.insertOne({...task, userID: userID});
+    }
+    deleteTask(taskID: string, userID: string) {
+        return this.tasks.deleteOne({ _id: new ObjectId(taskID), userID: userID });
     }
 }
 const pomodoroRepository = new PomodoroRepository()

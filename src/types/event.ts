@@ -36,7 +36,8 @@ export type Pomodoros = Pomodoro[];
 
 export type Session={
     pomodoroNumber: number,
-    taskCompleted: number
+    taskCompleted: number,
+    date: string
 }
 export type Sessions=Session[];
 
@@ -56,11 +57,11 @@ export function isNoteList(note: any): note is Notes {
 }
 
 export function isPomodoro(pomodoro: any): pomodoro is Pomodoro {
-    return "pomodoroNumber" in pomodoro && "pomodoroType" in pomodoro && "pomodoroDuration" in pomodoro;
+    return "pomodoroNumber" in pomodoro && "pomodoroType" in pomodoro && "pomodoroDuration" in pomodoro && "shortBreakDuration" in pomodoro && "longBreakDuration" in pomodoro && "longBreakInterval" in pomodoro;
 }
 
 export function isSession(session: any): session is Session {
-    return "pomodoroNumber" in session && "taskCompleted" in session;
+    return "pomodoroNumber" in session && "taskCompleted" in session && "date" in session;
 }
 
 export function isTask(task: any): task is Task {

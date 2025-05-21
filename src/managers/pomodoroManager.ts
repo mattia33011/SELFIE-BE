@@ -21,20 +21,24 @@ export class PomodoroManager {
         return PomodoroRepository.save(pomodoro, userID).then(it => it.acknowledged)
     }
 
-    public async fetchSessions(userID: string): Promise<Sessions> {
+    public async fetchStudySessions(userID: string): Promise<Sessions> {
         return PomodoroRepository
             .readSession(userID)
             .then(sessions => {
                 console.log(sessions);
                 return sessions.map((session): Session => ({
                     pomodoroNumber: session.pomodoroNumber,
-                    taskCompleted: session.taskCompleted
+                    taskCompleted: session.taskCompleted,
+                    date: session.date
                 }))
             })
     }
 
-    public async insertSession(session: Session, userID: string): Promise<boolean> {
+    public async insertStudySession(session: Session, userID: string): Promise<boolean> {
         return PomodoroRepository.saveSession(session, userID).then(it => it.acknowledged)
+    }
+    public async deleteStudySession(sessionID: string, userID: string): Promise<boolean> {
+        return PomodoroRepository.deleteSession(sessionID, userID).then(it => it.acknowledged)
     }
 
     public async fetchTasks(userID: string): Promise<Tasks> {
@@ -51,6 +55,10 @@ export class PomodoroManager {
     }
     public async insertTask(task: Task, userID: string): Promise<boolean> {
         return PomodoroRepository.saveTask(task, userID).then(it => it.acknowledged)
+    }
+
+    public async deleteTask(taskID: string, userID: string): Promise<boolean> {
+        return PomodoroRepository.deleteTask(taskID, userID).then(it => it.acknowledged)
     }
 }
 

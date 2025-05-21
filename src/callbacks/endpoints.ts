@@ -278,7 +278,7 @@ export const postPomodoroCallback: RequestHandler = async (
 }
 
 //mi da la lista di sessioni passate (comprende numero di pomodori fatti e task completate)
-export const getSessionsCallback: RequestHandler = async (
+export const getStudySessionsCallback: RequestHandler = async (
     req,
     res,
     next
@@ -291,7 +291,7 @@ export const getSessionsCallback: RequestHandler = async (
   const { email } = req?.user;
   
   try{
-    const data = await pomodoroManager.fetchSessions(email)
+    const data = await pomodoroManager.fetchStudySessions(email)
     res.status(200).json(data);
   }
   catch(e: any){
@@ -299,7 +299,7 @@ export const getSessionsCallback: RequestHandler = async (
   }
 }
 
-export const postSessionsCallback: RequestHandler = async (
+export const postStudySessionsCallback: RequestHandler = async (
     req,
     res,
     next
@@ -315,7 +315,7 @@ export const postSessionsCallback: RequestHandler = async (
     return next(getSelfieError("NOTE_002", 400, "Body is invalid"))
 
   try{
-    const data = await pomodoroManager.insertSession(body, email,)
+    const data = await pomodoroManager.insertStudySession(body, email,)
 
     if(!data){
       return next(getSelfieError("NOTE_003", 500, "ops, there was an error, try later"));
@@ -327,6 +327,18 @@ export const postSessionsCallback: RequestHandler = async (
     return next(getSelfieError("NOTE_003", 500, "ops, there was an error, try later"));
   }
 }
+
+export const deleteStudySessionsCallback: RequestHandler = async (req, res, next) => {
+  if (!req.params.userid)
+    return next(getSelfieError("DEU_001", 400, "Provide userID"));
+  if (!req.params.sessionid)
+    return next(getSelfieError("DEU_001", 400, "Provide sessionID"));
+
+  const isDeleted = await pomodoroManager.deleteStudySession(req.params.sessionid, req.params.userid);
+  if (!isDeleted) return next(getSelfieError("DEU_002", 404, "User not found"));
+
+  res.status(200).send("");
+};
 
 //mi da la lista di task
 export const getTasksCallback: RequestHandler = async (
