@@ -402,7 +402,7 @@ export const getEventsCallback: RequestHandler = async (
   //@ts-ignore
   const { email } = req?.user;
   try{
-    const data = await eventManager.fetchNotes(email)
+    const data = await eventManager.fetchEvents(email)
     res.status(200).json(data);
   }
   catch(e: any){

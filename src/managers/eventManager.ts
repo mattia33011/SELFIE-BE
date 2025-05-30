@@ -2,7 +2,7 @@ import {Event, Events} from "../types/event";
 import eventRepository from "../repositories/eventRepository";
 
 class EventManager {
-    public async fetchNotes(userID: string): Promise<Events> {
+    public async fetchEvents(userID: string): Promise<Events> {
         return eventRepository
             .readEventById(userID)
             .then(notes => {
