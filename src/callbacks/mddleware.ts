@@ -15,7 +15,6 @@ export const errorHandler: ErrorRequestHandler = (err, req, res) => {
     );
     res.status(err.status).json(err);
   } else {
-    console.log(JSON.stringify(err));
     logger.error(
       err,
       `INTERNAL SERVER ERROR - Status: 500 - Request: ${req.originalUrl}`

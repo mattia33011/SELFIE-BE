@@ -29,7 +29,8 @@ import {
   postTasksCallback,
   getStudySessionsCallback,
   postStudySessionsCallback,
-  deleteStudySessionsCallback
+  deleteStudySessionsCallback,
+  deleteTasksCallback
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -82,7 +83,7 @@ app.post('/users/:userid/notes/recent', jwtMiddleWare, postRecentNotesCallback);
 
 //POMODORO
 app.get('/users/:userid/pomodoro', jwtMiddleWare, getPomodoroCallback);
-app.post('/users/:userid/pomodoro', jwtMiddleWare, postPomodoroCallback);
+app.put('/users/:userid/pomodoro', jwtMiddleWare, postPomodoroCallback);
 
 //sessioni passate
 app.get('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, getStudySessionsCallback);
@@ -92,7 +93,7 @@ app.delete('/users/:userid/pomodoro/oldSessions/:sessionid', jwtMiddleWare, dele
 //tasks
 app.get('/users/:userid/pomodoro/tasks', jwtMiddleWare, getTasksCallback);
 app.post('/users/:userid/pomodoro/tasks', jwtMiddleWare, postTasksCallback);
-
+app.delete('/users/:userid/pomodoro/tasks/:taskid', jwtMiddleWare, deleteTasksCallback);
 
 //EVENTS
 app.get('/users/:userid/events', jwtMiddleWare, getEventsCallback)

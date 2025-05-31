@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type Events = Event[]
 
 export type Event = {
@@ -16,7 +18,7 @@ export type Note = {
     expanded: Boolean,
     content: string,
     icon: String,
-    children: any[],
+    children: Notes,
     type: string,
     parent: string,
     droppable: Boolean,
@@ -29,9 +31,11 @@ export type Pomodoro = {
     //settings per il pomodoro
     pomodoroDuration: number,
     shortBreakDuration: number,
-    longBreakDuration: number,
+    longBreakDuration: number, 
     longBreakInterval: number,
 }
+export type DBPomorodo = Pomodoro & {_id?: ObjectId, userID: string}
+
 export type Pomodoros = Pomodoro[];
 
 export type Session={
@@ -42,6 +46,7 @@ export type Session={
 export type Sessions=Session[];
 
 export type Task = {
+    id?: ObjectId
     taskName: string,
     taskStatus: string,
     taskCompleted: boolean
