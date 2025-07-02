@@ -19,6 +19,7 @@ import {
 } from "../types/event";
 import { nextTick } from "process";
 import { convertNumericObjectToArray } from "../utils";
+import { ObjectId } from "mongodb";
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
   if (!body.userID || !body.password)
@@ -450,3 +451,30 @@ export const postEventsCallback: RequestHandler = async (req, res, next) => {
     );
   }
 };
+
+export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+
+  //@ts-ignore
+  const { email } = req.user;
+  const _id = req.body._id;
+
+  if (typeof _id !== "string" || !isEvent(_id)) {
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
+  }
+
+  try {
+    const isDeleted = await eventManager.delete(_id, email);
+    if (!isDeleted)
+      return next(getSelfieError("EVENT_004", 404, "Event not found"));
+
+    res.status(200).send("");
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
+
