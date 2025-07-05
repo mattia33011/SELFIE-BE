@@ -90,6 +90,19 @@ class UserRepository extends Repository {
       { $set: {profilePicture: bufferData} }
     );
   }
+
+
+  async autoSuggestNames(partialSearch: string): Promise<string[]> {
+    const regex = new RegExp(partialSearch, 'i');
+    return this.users.find(
+        {username: {$regex: regex}},
+    ).limit(3)
+        .toArray()
+        .then(users => {
+            return users.map(user => user.username);
+        });
+}
+
 }
 
 const userRepository = new UserRepository();

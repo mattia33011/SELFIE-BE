@@ -6,7 +6,7 @@ import { SelfieError, getSelfieError } from "../types/errors";
 const logger = pino();
 
 // Middleware handle error
-export const errorHandler: ErrorRequestHandler = (err, req, res) => {
+export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof SelfieError) {
     logger.error(
       `Error: ${JSON.stringify(err.error)} - Status: ${err.status} - Request: ${
@@ -22,7 +22,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res) => {
     res
       .status(500)
       .json(
-        getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR")
+        getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR").toJSON()
       );
   }
 };
