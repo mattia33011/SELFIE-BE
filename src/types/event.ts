@@ -7,6 +7,7 @@ export  type CalendarEvent = {
   end?: Date | string;
   allDay?: boolean;
   _id: ObjectId;
+  rrule: any;
   extendedProps?: {
     luogo?: string;
     tipo?: 'attività' | 'evento';
@@ -17,8 +18,19 @@ export  type CalendarEvent = {
 export type Events = CalendarEvent[];
 
 export function isEvent(event: any): event is CalendarEvent {
-    return "title" in event && "end" in event && "color" in event && "_id" in event;
+    if (event.allDay==true)
+        return "title" in event && "color" in event;
+    else
+        return "title" in event && "end" in event && "color" in event;
 }
+
+export function isEventid(event: any): event is CalendarEvent {
+    if (event.allDay==true)
+        return "title" in event && "color" in event && "_id" in event;
+    else
+        return "title" in event && "end" in event && "color" in event && "_id" in event;
+}
+
 export type Notes = Note[]
 
 export type Note = {
