@@ -34,8 +34,8 @@ export class ProjectManager {
         if (project == undefined)
             throw getSelfieError("PROJECT_404", 404, "Project not found.");
                 
-        // if(user!.username !== project!.author)
-        //    throw getSelfieError("PROJECT_403", 403, "User does not have update privileges")
+        if(user!.username !== project!.author)
+            throw getSelfieError("PROJECT_403", 403, "User does not have update privileges")
         const result = await ProjectRepository.updateProject(request);
         return result.acknowledged;
     }
