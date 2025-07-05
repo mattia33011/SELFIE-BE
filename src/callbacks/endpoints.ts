@@ -482,6 +482,30 @@ export const postEventsCallback: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const putEventsCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+
+  //@ts-ignore
+  const { email } = req.user;
+  const _id = req.params.eventid;
+  const body = req.body;
+
+  if (_id == undefined || !isEvent(body)) {
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
+  }
+
+  try {
+    const updatedId = await eventManager.update(_id, email, body);
+    
+    res.status(200).send(updatedId);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
 export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore
   if (!req.user?.email)
@@ -489,9 +513,9 @@ export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
 
   //@ts-ignore
   const { email } = req.user;
-  const _id = req.body._id;
+  const _id = req.params.eventid;
 
-  if (typeof _id !== "string" || !isEvent(_id)) {
+  if (_id == undefined) {
     return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
   }
 

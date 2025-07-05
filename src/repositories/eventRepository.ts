@@ -23,6 +23,12 @@ class EventRepository extends Repository {
     async updateNote(noteID: ObjectId, note: Note) {
         return this.events.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: new Date()}});
     }
+    async readEvent(eventID: ObjectId){
+        return this.events.findOne({_id:eventID})
+    }
+    async update(event: CalendarEvent, eventID: string){
+        return this.events.updateOne({$and: [{_id: new ObjectId(eventID)}]}, {$set: event})
+    }
 }
 
 const eventRepository = new EventRepository()

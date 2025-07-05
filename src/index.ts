@@ -21,7 +21,9 @@ import {
   postNotesCallback,
   getEventsCallback,
   postEventsCallback,
+  putEventsCallback,
   getPomodoroCallback,
+  deleteEventsCallback,
   postPomodoroCallback,
   getRecentNotesCallback,
   postRecentNotesCallback,
@@ -100,6 +102,8 @@ app.delete('/users/:userid/pomodoro/tasks/:taskid', jwtMiddleWare, deleteTasksCa
 //EVENTS
 app.get('/users/:userid/events', jwtMiddleWare, getEventsCallback)
 app.post('/users/:userid/events', jwtMiddleWare, postEventsCallback)
+app.put('/users/:userid/events/:eventid', jwtMiddleWare, putEventsCallback)
+app.delete('/users/:userid/events/:eventid', jwtMiddleWare, deleteEventsCallback)
 
 // Middleware to catch every unhandled error
 app.use(errorHandler);

@@ -1,5 +1,6 @@
 import {CalendarEvent, Events} from "../types/event";
 import eventRepository from "../repositories/eventRepository";
+import { ObjectId } from "mongodb";
 
 class EventManager {
     public async fetchEvents(userID: string): Promise<Events> {
@@ -12,6 +13,7 @@ class EventManager {
                     end: note.end,
                     start: note.start,
                     _id: note._id,
+                    rrule: note.rrule,
                     allDay: note.allDay,
                     extendedProps: {
                         luogo: note.luogo,
@@ -21,15 +23,29 @@ class EventManager {
                 }))
             })
     }
-    public async insert(event: CalendarEvent, userID: string): Promise<boolean> {
-        return eventRepository.save(event, userID).then(it => it.acknowledged)
+    public async insert(event: CalendarEvent, userID: string): Promise<CalendarEvent> {
+        const id = await eventRepository.save(event, userID).then(it => it.insertedId)
+        return eventRepository.readEvent(id).then(it=>({
+                title: it?.title,
+                    color: it?.color,
+                    end: it?.end,
+                    start: it?.start,
+                    _id: it?._id,
+                    rrule: it?.rrule,
+                    allDay: it?.allDay,
+                    extendedProps: {
+                        luogo: it?.luogo,
+                        tipo: it?.tipo,
+                        stato: it?.stato,
+                    }
+        }) as CalendarEvent)
     }
     public async delete(eventID: string, userID: string): Promise<boolean> {
         return eventRepository.delete(eventID, userID).then(it => it.acknowledged);
     }
-    /* public async update(event: Event, userID: string): Promise<boolean> {
-        return eventRepository.update(event, userID).then(it => it.acknowledged);
-    } */
+    public async update(eventID: string, userID: string, event: CalendarEvent): Promise<ObjectId | null> {
+        return eventRepository.update(event, eventID).then(it => it.upsertedId);
+    }
 }
 
 export const eventManager = new EventManager();
