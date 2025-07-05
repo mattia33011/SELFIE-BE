@@ -23,7 +23,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     res
       .status(500)
       .json(
-        getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR")
+        getSelfieError("INTERNAL_SERVER_ERROR", 500, "INTERNAL SERVER ERROR").toJSON()
       );
   }
 };
