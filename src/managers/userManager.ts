@@ -124,6 +124,14 @@ class UserManager {
     const user = (await userRepository.read(userID, false, true)) as DBUser;
     return user.profilePicture;
   }
+
+  async autoSuggestName(partialName: string, userId: string): Promise<string[]> {
+    const user = await userRepository.read(userId);
+    if (!user)
+      throw getSelfieError("USER_404", 404, "USER_NOT_FOUND");
+    return await userRepository.autoSuggestNames(partialName);
+  }
+
 }
 const userManager = new UserManager();
 export default userManager;
