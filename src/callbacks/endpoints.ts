@@ -18,9 +18,13 @@ import {
 } from "../types/event";
 import { nextTick } from "process";
 import { convertNumericObjectToArray } from "../utils";
+
+import { ObjectId } from "mongodb";
+
 import ProjectRepository from "../repositories/projectRepository";
 import {Project, ProjectCreateRequest} from "../types/project";
 import {projectManager, ProjectManager} from "../managers/projectManager";
+
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -462,6 +466,54 @@ export const postEventsCallback: RequestHandler = async (req, res, next) => {
     return next(
       getSelfieError("EVENT_003", 500, "ops, there was an error, try later")
     );
+  }
+};
+
+export const putEventsCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+
+  //@ts-ignore
+  const { email } = req.user;
+  const _id = req.params.eventid;
+  const body = req.body;
+
+  if (_id == undefined || !isEvent(body)) {
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
+  }
+
+  try {
+    const updatedId = await eventManager.update(_id, email, body);
+    
+    res.status(200).send(updatedId);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
+export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+
+  //@ts-ignore
+  const { email } = req.user;
+  const _id = req.params.eventid;
+
+  if (_id == undefined) {
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
+  }
+
+  try {
+    const isDeleted = await eventManager.delete(_id, email);
+    if (!isDeleted)
+      return next(getSelfieError("EVENT_004", 404, "Event not found"));
+
+    res.status(200).send("");
+  } catch (err) {
+    return next(err);
   }
 };
 
