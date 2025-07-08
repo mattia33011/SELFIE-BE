@@ -21,10 +21,10 @@ class NoteManager {
             })
     }
 
-    public async insert(note: Note, userID: string): Promise<boolean> {
-        return noteRepository.save(note, userID).then(it => it.acknowledged)
+    public async insertNote(note: Note, userID: string): Promise<boolean> {
+        return noteRepository.saveNote(note, userID).then(it => it.acknowledged)
     }
-    async delete(noteID: string, userID: string): Promise<boolean> {
+    async deleteNote(noteID: string, userID: string): Promise<boolean> {
         return noteRepository.delete(noteID, userID).then(it => it.deletedCount === 1)
     }
 
@@ -49,7 +49,7 @@ class NoteManager {
     }
 
     public async insertRecent(note: Note, userID: string): Promise<boolean> {
-        return noteRepository.save(note, userID).then(it => it.acknowledged)
+        return noteRepository.saveNote(note, userID).then(it => it.acknowledged)
     }
 }
 

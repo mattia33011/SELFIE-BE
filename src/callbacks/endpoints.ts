@@ -7,7 +7,7 @@ import { noteManager } from "../managers/noteManager";
 import { eventManager } from "../managers/eventManager";
 import { pomodoroManager } from "../managers/pomodoroManager";
 import {
-  Session,
+  StudySession,
   Task,
   Tasks,
   isEvent,
@@ -163,7 +163,7 @@ export const postNotesCallback: RequestHandler = async (req, res, next) => {
     return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
 
   try {
-    const data = await noteManager.insert(body, email);
+    const data = await noteManager.insertNote(body, email);
 
     if (!data) {
       return next(
@@ -299,7 +299,7 @@ export const getStudySessionsCallback: RequestHandler = async (
   }
 };
 
-export const postStudySessionsCallback: RequestHandler = async (
+export const putStudySessionsCallback: RequestHandler = async (
   req,
   res,
   next
@@ -310,7 +310,7 @@ export const postStudySessionsCallback: RequestHandler = async (
   //@ts-ignore
   const { email } = req?.user;
 
-  const body = convertNumericObjectToArray(req.body) as Session[];
+  const body = convertNumericObjectToArray(req.body) as StudySession[];
   if (body == undefined || body.find((it) => !isSession(it)))
     return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
 
@@ -379,6 +379,36 @@ export const postTasksCallback: RequestHandler = async (req, res, next) => {
 
   try {
     const data = await pomodoroManager.insertTask(body, email);
+    console.log(data);
+    
+    if (!data) {
+      return next(
+        getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
+      );
+    }
+
+    res.status(200).json(data);
+  } catch (e: any) {
+    console.log(e);
+    return next(
+      getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
+    );
+  }
+};
+
+export const putTasksCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+
+  const body = convertNumericObjectToArray(req.body) as Task[];
+  if (body == undefined || body.find((it) => !isTask(it)))
+    return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
+
+  try {
+    const data = await pomodoroManager.updateTask(body, email);
 
     if (!data) {
       return next(

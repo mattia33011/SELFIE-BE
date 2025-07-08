@@ -27,8 +27,9 @@ import {
   postRecentNotesCallback,
   getTasksCallback,
   postTasksCallback,
+  putTasksCallback,
   getStudySessionsCallback,
-  postStudySessionsCallback,
+  putStudySessionsCallback,
   deleteStudySessionsCallback,
   deleteTasksCallback
 } from "./callbacks/endpoints";
@@ -82,17 +83,18 @@ app.get('/users/:userid/notes/recent', jwtMiddleWare, getRecentNotesCallback);
 app.post('/users/:userid/notes/recent', jwtMiddleWare, postRecentNotesCallback);
 
 //POMODORO
-app.get('/users/:userid/pomodoro', jwtMiddleWare, getPomodoroCallback);
-app.put('/users/:userid/pomodoro', jwtMiddleWare, postPomodoroCallback);
+app.get('/users/:userid/pomodoro/pomodoroinfo', jwtMiddleWare, getPomodoroCallback);
+app.put('/users/:userid/pomodoro/pomodoroinfo', jwtMiddleWare, postPomodoroCallback);
 
 //sessioni passate
 app.get('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, getStudySessionsCallback);
-app.post('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, postStudySessionsCallback);
+app.put('/users/:userid/pomodoro/oldSessions', jwtMiddleWare, putStudySessionsCallback);
 app.delete('/users/:userid/pomodoro/oldSessions/:sessionid', jwtMiddleWare, deleteStudySessionsCallback);
 
 //tasks
 app.get('/users/:userid/pomodoro/tasks', jwtMiddleWare, getTasksCallback);
 app.post('/users/:userid/pomodoro/tasks', jwtMiddleWare, postTasksCallback);
+app.put('/users/:userid/pomodoro/tasks', jwtMiddleWare, putTasksCallback);
 app.delete('/users/:userid/pomodoro/tasks/:taskid', jwtMiddleWare, deleteTasksCallback);
 
 //EVENTS

@@ -23,6 +23,7 @@ export type Note = {
     parent: string,
     droppable: Boolean,
     lastEdit: Date,
+    _id?: ObjectId
 }
 
 export type Pomodoro = {
@@ -33,20 +34,23 @@ export type Pomodoro = {
     shortBreakDuration: number,
     longBreakDuration: number, 
     longBreakInterval: number,
+    id: string
 }
-export type DBPomorodo = Pomodoro & {_id?: ObjectId, userID: string}
+export type DBPomorodo = Pomodoro & {userID: string}
 
 export type Pomodoros = Pomodoro[];
 
-export type Session={
+export type StudySession={
+    id: number,
+    _id: ObjectId,
     pomodoroNumber: number,
     taskCompleted: number,
     date: string
 }
-export type Sessions=Session[];
+export type StudySessions=StudySession[];
 
 export type Task = {
-    id?: ObjectId
+    _id?: ObjectId
     taskName: string,
     taskStatus: string,
     taskCompleted: boolean
@@ -54,7 +58,7 @@ export type Task = {
 export type Tasks=Task[];
 
 export function isNote(note: any): note is Note {
-    return "title" in note && "lastEdit" in note && "content" in note && "created" in note;
+    return "children" in note && "content" in note && "droppableNode" in note && "expanded" in note && "icon" in note && "label" in note && "lastEdit" in note && "parent" in note && "type" in note;
 }
 
 export function isNoteList(note: any): note is Notes {
@@ -65,7 +69,8 @@ export function isPomodoro(pomodoro: any): pomodoro is Pomodoro {
     return "pomodoroNumber" in pomodoro && "pomodoroType" in pomodoro && "pomodoroDuration" in pomodoro && "shortBreakDuration" in pomodoro && "longBreakDuration" in pomodoro && "longBreakInterval" in pomodoro;
 }
 
-export function isSession(session: any): session is Session {
+export function isSession(session: any): session is StudySession {
+    if(session === null) return false;
     return "pomodoroNumber" in session && "taskCompleted" in session && "date" in session;
 }
 

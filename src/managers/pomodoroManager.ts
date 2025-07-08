@@ -4,8 +4,8 @@ import {
     DBPomorodo,
   Pomodoro,
   Pomodoros,
-  Session,
-  Sessions,
+  StudySession,
+  StudySessions,
   Task,
   Tasks,
 } from "../types/event";
@@ -22,27 +22,34 @@ export class PomodoroManager {
         shortBreakDuration: pomodoro.shortBreakDuration,
         longBreakDuration: pomodoro.longBreakDuration,
         longBreakInterval: pomodoro.longBreakInterval,
+        id: pomodoro.id,
       }));
     });
   }
   public async save(pomodoro: Pomodoro, userID: string): Promise<boolean> {
     const user = await userRepository.read(userID);
-    const pomodoroToUpdate = await pomodoroRepository.readPomodoro(user!.email) as DBPomorodo[]
-    let pomodoroToSave: DBPomorodo = {...pomodoro, userID: user!.email}
-    if(pomodoroToUpdate.length != 0)
-        pomodoroToSave._id = pomodoroToUpdate[0]._id 
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const pomodoroToUpdate = await PomodoroRepository.readPomodoro(user.email) as unknown as DBPomorodo[];
+    let pomodoroToSave: DBPomorodo = { ...pomodoro, userID: user.email };
+    if (pomodoroToUpdate.length !== 0) {
+      pomodoroToSave.id = pomodoroToUpdate[0].id;
+    }
 
     return PomodoroRepository.save(pomodoroToSave).then(
       (it) => it.acknowledged
     );
   }
 
-  public async fetchStudySessions(userID: string): Promise<Sessions> {
+  public async fetchStudySessions(userID: string): Promise<StudySessions> {
     const user = await userRepository.read(userID);
     return PomodoroRepository.readSession(user!.email).then((sessions) => {
       console.log(sessions);
       return sessions.map(
-        (session): Session => ({
+        (session): StudySession => ({
+          id: sessions.indexOf(session) + 1,
+          _id: session._id,
           pomodoroNumber: session.pomodoroNumber,
           taskCompleted: session.taskCompleted,
           date: session.date,
@@ -52,12 +59,12 @@ export class PomodoroManager {
   }
 
   public async insertStudySession(
-    session: Session[],
+    session: StudySession[],
     userID: string
-  ): Promise<boolean> {
+  ): Promise<StudySessions> {
     const user = await userRepository.read(userID);
     return PomodoroRepository.saveSession(session, user!.email).then(
-      (it) => it.acknowledged
+      (it) => it
     );
   }
   public async deleteStudySession(
@@ -76,7 +83,7 @@ export class PomodoroManager {
       console.log(tasks);
       return tasks.map(
         (task): Task => ({
-          id: task._id,
+          _id: task._id,
           taskName: task.taskName,
           taskStatus: task.taskStatus,
           taskCompleted: task.taskCompleted,
@@ -84,12 +91,20 @@ export class PomodoroManager {
       );
     });
   }
-  public async insertTask(task: Task[], userID: string): Promise<boolean> {
+  public async insertTask(task: Task[], userID: string): Promise<Tasks> {
     const user = await userRepository.read(userID);
     return PomodoroRepository.saveTask(task, user!.email).then(
-      (it) => it.acknowledged
+      (it) => it
     );
   }
+
+  public async updateTask(task: Task[], userID: string): Promise<boolean> {
+    const user = await userRepository.read(userID);
+    return PomodoroRepository.updateTask(task, user!.email).then(
+      (it) => true
+    );
+  }
+
 
   public async deleteTask(taskID: string, userID: string): Promise<boolean> {
     const user = await userRepository.read(userID);

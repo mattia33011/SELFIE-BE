@@ -1,6 +1,6 @@
 import { Repository } from "./repository";
 import { Collection, ObjectId } from "mongodb";
-import { DBPomorodo, Pomodoro, Session, Task } from "../types/event";
+import { DBPomorodo, Pomodoro, StudySession, Task, Tasks, StudySessions } from "../types/event";
 
 class PomodoroRepository extends Repository {
   private readonly pomodoros: Collection;
@@ -19,7 +19,7 @@ class PomodoroRepository extends Repository {
     await this.sessions.createIndex({ id: 1 }, { unique: false });
     await this.tasks.createIndex({ id: 1 }, { unique: false });
   }
-
+ 
   async save(pomodoro: DBPomorodo) {
     return this.pomodoros.updateOne({userID: pomodoro.userID}, {$set: pomodoro});
   }
@@ -28,9 +28,11 @@ class PomodoroRepository extends Repository {
     return this.pomodoros.find({ userID: userID }).toArray();
   }
 
-  async saveSession(session: Session[], userID: string) {
-    const mappedSession= session.map(it => ({ ...it, userID: userID }))
-    return this.sessions.insertMany(mappedSession);
+  async saveSession(session: StudySession[], userID: string) {
+    const mappedSession= session.map((session) => ({ ...session, userID: userID }));
+
+    await this.sessions.insertMany(mappedSession);
+    return this.readSession(userID) as Promise<StudySessions>;
   }
   async readSession(userID: string) {
     return this.sessions.find({ userID: userID }).toArray();
@@ -46,12 +48,26 @@ class PomodoroRepository extends Repository {
   async readTask(userID: string) {
     return this.tasks.find({ userID: userID }).toArray();
   }
-  async saveTask(tasks: Task[], userID: string) {
+  async saveTask(tasks: Task[], userID: string):Promise<Tasks> {
     const mappedTasks = tasks.map((task) => ({ ...task, userID: userID }));
-    return this.tasks.insertMany(mappedTasks);
+    await this.tasks.insertMany(mappedTasks);
+    return this.readTask(userID) as Promise<Tasks>;
   }
+  async updateTask(tasks: Task[], userID: string) {
+    const mappedTasks = tasks.map((task) => ({ ...task, userID: userID }));
+    return mappedTasks.map((task) =>
+      this.tasks.updateOne({userID: userID, _id:new ObjectId(task._id)},{$set:{
+        taskName: task.taskName,
+        taskStatus: task.taskStatus,
+        taskCompleted: task.taskCompleted,
+      }}, { upsert: true })
+    );
+  }
+
   async deleteTask(taskID: string, userID: string) {
-    return this.tasks.deleteOne({ _id: new ObjectId(taskID), userID: userID });
+    return this.tasks.deleteOne({ 
+      _id: new ObjectId(taskID), 
+      userID: userID });
   }
 }
 const pomodoroRepository = new PomodoroRepository();
