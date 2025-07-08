@@ -1,16 +1,36 @@
 import { ObjectId } from "mongodb";
 
-export type Events = Event[]
+export  type CalendarEvent = {
+  title: string;
+  color?: string;
+  start?: Date | string;
+  end?: Date | string;
+  allDay?: boolean;
+  _id: ObjectId;
+  rrule: any;
+  extendedProps?: {
+    luogo?: string;
+    tipo?: 'attività' | 'evento';
+    stato?: 'da_fare' | 'in_corso' | 'completata';
+  };
+}
 
-export type Event = {
-    title: string,
-    expireDate: Date,
-    description?: string,
-    color?: string,
+export type Events = CalendarEvent[];
+
+export function isEvent(event: any): event is CalendarEvent {
+    if (event.allDay==true)
+        return "title" in event && "color" in event;
+    else
+        return "title" in event && "end" in event && "color" in event;
 }
-export function isEvent(event: any): event is Event {
-    return "title" in event && "expireDate" in event && "description" in event;
+
+export function isEventid(event: any): event is CalendarEvent {
+    if (event.allDay==true)
+        return "title" in event && "color" in event && "_id" in event;
+    else
+        return "title" in event && "end" in event && "color" in event && "_id" in event;
 }
+
 export type Notes = Note[]
 
 export type Note = {

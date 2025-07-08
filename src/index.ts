@@ -21,7 +21,9 @@ import {
   postNotesCallback,
   getEventsCallback,
   postEventsCallback,
+  putEventsCallback,
   getPomodoroCallback,
+  deleteEventsCallback,
   postPomodoroCallback,
   getRecentNotesCallback,
   postRecentNotesCallback,
@@ -31,7 +33,12 @@ import {
   getStudySessionsCallback,
   putStudySessionsCallback,
   deleteStudySessionsCallback,
-  deleteTasksCallback
+  deleteTasksCallback,
+  saveProjectCallback,
+  fetchProjectsCallback,
+  deleteProjectCallback,
+  filterProjectsCallback,
+  autoSuggestUsersCallback, updateProjectCallback, addProjectTaskCallback
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -100,6 +107,20 @@ app.delete('/users/:userid/pomodoro/tasks/:taskid', jwtMiddleWare, deleteTasksCa
 //EVENTS
 app.get('/users/:userid/events', jwtMiddleWare, getEventsCallback)
 app.post('/users/:userid/events', jwtMiddleWare, postEventsCallback)
+app.put('/users/:userid/events/:eventid', jwtMiddleWare, putEventsCallback)
+app.delete('/users/:userid/events/:eventid', jwtMiddleWare, deleteEventsCallback)
+
+//project
+app.post('/users/:userid/project', jwtMiddleWare,saveProjectCallback);
+app.post('/users/:userid/project/search', jwtMiddleWare, filterProjectsCallback)
+app.patch('/users/:userid/project/task', jwtMiddleWare, addProjectTaskCallback)
+app.patch('/users/:userid/project', jwtMiddleWare, updateProjectCallback)
+app.get('/users/:userid/project', jwtMiddleWare ,fetchProjectsCallback);
+app.delete('/users/:userid/project/:projectid', jwtMiddleWare, deleteProjectCallback)
+
+//SUGGEST
+app.post('/users/:userid/search', jwtMiddleWare, autoSuggestUsersCallback)
+
 
 // Middleware to catch every unhandled error
 app.use(errorHandler);
@@ -110,7 +131,7 @@ checkDbConnection().then(it => {
   }
 
   app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost${port}`);
+    console.log(`[server]: Server is running at http://localhost:${port}`);
   })
 
 })
