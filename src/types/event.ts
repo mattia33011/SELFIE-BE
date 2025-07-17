@@ -34,19 +34,19 @@ export function isEventid(event: any): event is CalendarEvent {
 export type Notes = Note[]
 
 export type Note = {
-    label: string,
-    author: string,
-    members: string[],
-    expanded: Boolean,
-    content: string,
-    icon: String,
-    children: any[],
-    type: string,
-    parent: string,
-    droppableNode: Boolean,
-    lastEdit: Date,
-    _id?: ObjectId
-}
+    label: string;
+    author: string;
+    members: string[];
+    expanded: boolean;
+    content: string;
+    icon: string;
+    children: Note[];
+    type: 'note' | 'folder';
+    parent: Note | string | null;
+    droppableNode: boolean;
+    lastEdit: Date;
+    _id?: ObjectId; // Usa ObjectId invece di string
+};
 
 export type Pomodoro = {
     pomodoroNumber: number,
