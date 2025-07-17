@@ -19,6 +19,7 @@ import {
   resetPasswordCallback,
   getNotesCallback,
   postNotesCallback,
+  deleteNotesCallback,
   getEventsCallback,
   postEventsCallback,
   putEventsCallback,
@@ -83,7 +84,7 @@ app.get('/users/:userid/profile-picture', jwtMiddleWare, getProfilePictureCallba
 //NOTES
 app.get('/users/:userid/notes', jwtMiddleWare, getNotesCallback);
 app.post('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
-app.delete('/users/:userid/notes', jwtMiddleWare, postNotesCallback);
+app.delete('/users/:userid/notes/:noteid', jwtMiddleWare, deleteNotesCallback);
 
 //recent notes
 app.get('/users/:userid/notes/recent', jwtMiddleWare, getRecentNotesCallback);
