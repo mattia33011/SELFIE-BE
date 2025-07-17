@@ -7,6 +7,7 @@ import { noteManager } from "../managers/noteManager";
 import { eventManager } from "../managers/eventManager";
 import { pomodoroManager } from "../managers/pomodoroManager";
 import {
+  Pomodoro,
   StudySession,
   Task,
   isEvent,
@@ -157,16 +158,16 @@ export const getNotesCallback: RequestHandler = async (req, res, next) => {
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
 
   //@ts-ignore
-  const { email } = req?.user;
-  const dateFilter = req.query.dateFilter
-    ? new Date(req.query.dateFilter as string)
-    : undefined;
-  try {
-    const data = await noteManager.fetchNotes(email, dateFilter);
+  const userId = req.user.userid;
+  try{
+    const data = await noteManager.fetchNotes(userId);
+    if(data.length == 0) {
+      return next(getSelfieError("NOTE_404", 404, "No notes found"));
+    }
     res.status(200).json(data);
-  } catch (e: any) {
-    return next(getSelfieError("NOTE_001", 404, "Notes not found"));
-  }
+    } catch (e: any) {
+      return next(e);
+    }
 };
 
 export const postNotesCallback: RequestHandler = async (req, res, next) => {
@@ -177,25 +178,25 @@ export const postNotesCallback: RequestHandler = async (req, res, next) => {
   const { email } = req?.user;
 
   const body = req.body;
-  if (!isNote(body))
-    return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
 
-  try {
-    const data = await noteManager.insertNote(body, email);
-
-    if (!data) {
-      return next(
-        getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
-      );
-    }
-
-    res.status(200).json(data);
+  try{
+      const note = await noteManager.insertNote(body, email);
+      res.status(200).json(note);
   } catch (e: any) {
-    return next(
-      getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
-    );
+    return next(e);
   }
 };
+
+export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
+  const noteId = req.params.noteid;
+  const userId = req.params.userid;
+  try{
+    const data = await noteManager.deleteNote(noteId, userId);
+    res.status(200).json("note deleted successfully");
+  }catch (e: any) {
+    return next(e);
+  }
+}
 
 //array di note recenti
 export const getRecentNotesCallback: RequestHandler = async (
@@ -263,7 +264,7 @@ export const getPomodoroCallback: RequestHandler = async (req, res, next) => {
     const data = await pomodoroManager.fetchPomodoro(email);
     res.status(200).json(data);
   } catch (e: any) {
-    return next(getSelfieError("NOTE_001", 404, "Recent otes not found"));
+    return next(getSelfieError("NOTE_001", 404, "pomodoro not found"));
   }
 };
 
@@ -272,27 +273,14 @@ export const postPomodoroCallback: RequestHandler = async (req, res, next) => {
   if (!req.user?.email)
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
   //@ts-ignore
-  const { email } = req?.user;
+  const body = req.body as Pomodoro;
+  const userId=req.params.userid;
 
-  const body = req.body;
-  if (!isPomodoro(body))
-    return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
-
-  try {
-    const data = await pomodoroManager.save(body, email);
-
-    if (!data) {
-      return next(
-        getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
-      );
-    }
-
-    res.status(200).json(data);
+  try{
+    await pomodoroManager.save(body, userId);
+    res.status(200).json("Pomodoro updated successfully");
   } catch (e: any) {
-    console.error(e)
-    return next(
-      getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
-    );
+    return next(e);
   }
 };
 
