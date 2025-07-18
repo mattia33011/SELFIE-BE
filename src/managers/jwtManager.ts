@@ -5,9 +5,9 @@ class JwtManager {
   private readonly secretKey: string;
 
   constructor() {
-    if (!process.env.JWT_SECRET_KEY) throw new Error("No JWT_Secret provided");
+    //if (!process.env.JWT_SECRET_KEY) throw new Error("No JWT_Secret provided");
 
-    this.secretKey = process.env.JWT_SECRET_KEY;
+    this.secretKey =  "CHIAVE_SEGRETISSIMA" //process.env.JWT_SECRET_KEY;
   }
 
   generateJwt(user: UserSession) {

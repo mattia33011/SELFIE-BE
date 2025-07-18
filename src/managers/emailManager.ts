@@ -55,5 +55,5 @@ class EmailManager {
   }
 }
 
-const emailManager = new EmailManager();
-export default emailManager;
+//const emailManager = new EmailManager();
+//export default emailManager;

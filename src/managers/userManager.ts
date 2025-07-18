@@ -3,7 +3,7 @@ import userRepository from "../repositories/userRepository";
 import { DBUser, LoginResponse, User, UserSession } from "../types/user";
 import jwtManager from "./jwtManager";
 import { MongoDBErrorCode } from "../repositories/repository";
-import emailManager from "./emailManager";
+//import emailManager from "./emailManager";
 import { Recipient } from "mailersend";
 import crypto from "crypto";
 import { Binary } from "mongodb";
@@ -36,15 +36,15 @@ class UserManager {
   }
   // Unused
   async sendActivationEmail(user: User, activationToken: string) {
-    try {
-      await emailManager.sendActivateAccount(
-        new Recipient(user.email, `${user.firstName} ${user.lastName}`),
-        activationToken
-      );
-    } catch (e: any) {
-      await this.deleteAccount(user.email);
-      throw e;
-    }
+    //try {
+    //  await emailManager.sendActivateAccount(
+    //    new Recipient(user.email, `${user.firstName} ${user.lastName}`),
+    //    activationToken
+    //  );
+    //} catch (e: any) {
+    //  await this.deleteAccount(user.email);
+    //  throw e;
+    //}
   }
 
   async deleteAccount(userID: string) {
