@@ -21,7 +21,7 @@ async findByUser(username: string): Promise<Note[]> {
         $or: [{ author: username }, { members: username }]
     })
     .toArray();
-    console.log('Documenti dal DB:', note);
+    //console.log('Documenti dal DB:', note);
 
     return (await note).map(doc => ({
         _id: doc._id, // Mantieni l'ObjectId originale
@@ -39,13 +39,31 @@ async findByUser(username: string): Promise<Note[]> {
     }));
 }
 
-    async saveNote(event: Note, userID: string) {
-        return this.notes.insertOne({...event, userID: userID});
-    }
+async saveNote(event: any, userID: string) {
+    const note = event["0"]; // Estrai la nota vera
+    return this.notes.insertOne({ ...note, userID });
+}
 
-    async readNote(userID: string) {
-        return this.notes.find({user:userID}).toArray();
-    }
+async readNote(userID: string) {
+    const notes = await this.notes.find({ user: userID }).toArray();
+
+    return notes
+        .filter(doc => doc && typeof doc === 'object')
+        .map(doc => ({
+            _id: doc._id,
+            label: doc.label,
+            author: doc.author,
+            members: doc.members,
+            expanded: doc.expanded,
+            content: doc.content,
+            icon: doc.icon,
+            children: doc.children,
+            type: doc.type,
+            parent: doc.parent,
+            droppableNode: doc.droppableNode,
+            lastEdit: doc.lastEdit
+        }));
+}
 
     async updateNote(noteID: ObjectId, note: Note) {
         return this.notes.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: new Date()}});
