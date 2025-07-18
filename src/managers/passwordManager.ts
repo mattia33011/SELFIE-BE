@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 class PasswordManager {
   private readonly _salt = "$2b$10$mUicp4MD8h3h5HUnjQ.tWO"
