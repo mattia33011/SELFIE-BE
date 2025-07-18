@@ -9,7 +9,7 @@ public async fetchNotes(userID: string): Promise<Notes> {
         throw new Error('User not found');
     }
 
-    const notes = await noteRepository.findByUser(user.username);
+    const notes = await noteRepository.readNote(user.username);
     
     return notes
 
