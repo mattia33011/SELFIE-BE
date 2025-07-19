@@ -3,25 +3,17 @@ import noteRepository from "../repositories/noteRepository";
 import {Note, Notes} from "../types/event";
 
 class NoteManager {
-    public async fetchNotes(userID: string): Promise<Notes> {
-        const user = await userRepository.read(userID);
-        const notes = await noteRepository.findByUser(user!.username);
-        return notes.map(note => ({
-            label: note.label,
-            author: note.author,
-            members: note.members,
-            expanded: note.expanded,
-            content: note.content,
-            icon: note.icon,
-            children: note.children,
-            type: note.type,
-            parent: note.parent,
-            droppableNode: note.droppableNode,
-            lastEdit: note.lastEdit,
-            _id: note._id,
-        }));
+public async fetchNotes(userID: string): Promise<Notes> {
+    const user = await userRepository.read(userID);
+    if (!user) {
+        throw new Error('User not found');
     }
 
+    const notes = await noteRepository.readNote(user.username);
+    
+    return notes
+
+}
     public async insertNote(note: Note, userID: string): Promise<boolean> {
         return noteRepository.saveNote(note, userID).then(it => it.acknowledged)
     }
