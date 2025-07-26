@@ -170,7 +170,7 @@ export const getNotesCallback: RequestHandler = async (req, res, next) => {
     }
 };
 
-export const postNotesCallback: RequestHandler = async (req, res, next) => {
+export const putNotesCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore
   if (!req.user?.email)
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
@@ -259,9 +259,11 @@ export const getPomodoroCallback: RequestHandler = async (req, res, next) => {
   if (!req.user?.email)
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
   //@ts-ignore
-  const { email } = req?.user;
+  const userId = req.params.userid;
+  const pomodoroId = req.params.pomodoroid;
   try {
-    const data = await pomodoroManager.fetchPomodoro(email);
+    
+    const data = await pomodoroManager.fetchPomodoro(userId, pomodoroId);
     res.status(200).json(data);
   } catch (e: any) {
     return next(getSelfieError("NOTE_001", 404, "pomodoro not found"));

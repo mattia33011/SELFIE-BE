@@ -9,7 +9,7 @@ class PomodoroRepository extends Repository {
 
   constructor() {
     super("pomodoros");
-    this.pomodoros = this.collection;
+    this.pomodoros = this.client.collection("pomodoroinfo");
     this.sessions = this.client.collection("sessions");
     this.tasks = this.client.collection("tasks");
     this._setupCollections();
@@ -21,12 +21,23 @@ class PomodoroRepository extends Repository {
   }
  
   async save(pomodoro: DBPomorodo) {
-    return this.pomodoros.updateOne({userID: pomodoro.userID}, {$set: pomodoro});
+    const result = await this.pomodoros.updateOne(
+      { userID: pomodoro.userID },
+      { $set: pomodoro },
+      { upsert: true }
+    );
+    console.log('MongoDB result:', result); // Log del risultato
+    return result;
   }
 
-  async readPomodoro(userID: string) {
-    return this.pomodoros.find({ userID: userID }).toArray();
-  }
+async readPomodoro(userID: string) {
+  const query = {
+    $or: [
+      { userID: userID }
+    ]
+  };
+  return this.pomodoros.find(query).toArray();
+}
 
   async saveSession(session: StudySession[], userID: string) {
     const mappedSession= session.map((session) => ({ ...session, userID: userID }));

@@ -12,8 +12,12 @@ import {
 import pomodoroRepository from "../repositories/pomodoroRepository";
 
 export class PomodoroManager {
-  public async fetchPomodoro(userID: string): Promise<Pomodoros> {
-    return PomodoroRepository.readPomodoro(userID).then((pomodoros) => {
+  public async fetchPomodoro(userID: string, pomodoroId: string): Promise<Pomodoros> {
+    const query: any = { userID };
+  if (pomodoroId) {
+    query.id = new Object(pomodoroId);
+  }
+    return PomodoroRepository.readPomodoro(query).then((pomodoros) => {
       console.log(pomodoros);
       return pomodoros.map((pomodoro) => ({
         pomodoroNumber: pomodoro.pomodoroNumber,
@@ -31,8 +35,8 @@ export class PomodoroManager {
     if (!user) {
       throw new Error("User not found");
     }
-    const pomodoroToUpdate = await PomodoroRepository.readPomodoro(user.email) as unknown as DBPomorodo[];
-    let pomodoroToSave: DBPomorodo = { ...pomodoro, userID: user.email };
+    const pomodoroToUpdate = await PomodoroRepository.readPomodoro(userID) as unknown as DBPomorodo[];
+    let pomodoroToSave: DBPomorodo = { ...pomodoro, userID: userID };
     if (pomodoroToUpdate.length !== 0) {
       pomodoroToSave.id = pomodoroToUpdate[0].id;
     }
