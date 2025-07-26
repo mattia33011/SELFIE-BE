@@ -9,37 +9,42 @@ import {
   Task,
   Tasks,
 } from "../types/event";
-import pomodoroRepository from "../repositories/pomodoroRepository";
 
-export class PomodoroManager {
-  public async fetchPomodoro(userID: string, pomodoroId: string): Promise<Pomodoros> {
-    const query: any = { userID };
-  if (pomodoroId) {
-    query.id = new Object(pomodoroId);
-  }
-    return PomodoroRepository.readPomodoro(query).then((pomodoros) => {
-      console.log(pomodoros);
-      return pomodoros.map((pomodoro) => ({
-        pomodoroNumber: pomodoro.pomodoroNumber,
-        pomodoroType: pomodoro.pomodoroType,
-        pomodoroDuration: pomodoro.pomodoroDuration,
-        shortBreakDuration: pomodoro.shortBreakDuration,
-        longBreakDuration: pomodoro.longBreakDuration,
-        longBreakInterval: pomodoro.longBreakInterval,
-        id: pomodoro.id,
-      }));
-    });
+  export class PomodoroManager {
+    public async fetchPomodoro(userID: string, pomodoroId: string): Promise<Pomodoro> {
+      const query: any = { userID };
+    if (pomodoroId) {
+      query.id = pomodoroId;
+    }
+    const pomodoro = await PomodoroRepository.readPomodoro(query);
+    if (!pomodoro) {
+      throw new Error("Pomodoro not found");
+    }
+
+  return {
+    pomodoroNumber: pomodoro.pomodoroNumber,
+    pomodoroType: pomodoro.pomodoroType,
+    pomodoroDuration: pomodoro.pomodoroDuration,
+    shortBreakDuration: pomodoro.shortBreakDuration,
+    longBreakDuration: pomodoro.longBreakDuration,
+    longBreakInterval: pomodoro.longBreakInterval,
+    id: pomodoro.id,
+  };
   }
   public async save(pomodoro: Pomodoro, userID: string): Promise<boolean> {
     const user = await userRepository.read(userID);
     if (!user) {
       throw new Error("User not found");
     }
-    const pomodoroToUpdate = await PomodoroRepository.readPomodoro(userID) as unknown as DBPomorodo[];
     let pomodoroToSave: DBPomorodo = { ...pomodoro, userID: userID };
-    if (pomodoroToUpdate.length !== 0) {
-      pomodoroToSave.id = pomodoroToUpdate[0].id;
-    }
+    
+      pomodoroToSave.id = pomodoro.id;
+      pomodoroToSave.pomodoroNumber = pomodoro.pomodoroNumber;
+      pomodoroToSave.pomodoroType = pomodoro.pomodoroType;
+      pomodoroToSave.pomodoroDuration = pomodoro.pomodoroDuration;
+      pomodoroToSave.shortBreakDuration = pomodoro.shortBreakDuration;
+      pomodoroToSave.longBreakDuration = pomodoro.longBreakDuration;
+      pomodoroToSave.longBreakInterval = pomodoro.longBreakInterval;
 
     return PomodoroRepository.save(pomodoroToSave).then(
       (it) => it.acknowledged
