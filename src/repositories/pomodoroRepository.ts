@@ -30,14 +30,9 @@ class PomodoroRepository extends Repository {
     return result;
   }
 
-async readPomodoro(userID: string) {
-  const query = {
-    $or: [
-      { userID: userID }
-    ]
-  };
-  return this.pomodoros.find(query).toArray();
-}
+  async readPomodoro(query: any) {
+    return this.pomodoros.findOne(query);
+  }
 
   async saveSession(session: StudySession[], userID: string) {
     const mappedSession= session.map((session) => ({ ...session, userID: userID }));
