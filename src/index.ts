@@ -14,7 +14,7 @@ import {
   registerCallback,
   resetPasswordCallback,
   getNotesCallback,
-  postNotesCallback,
+  putNotesCallback,
   deleteNotesCallback,
   getEventsCallback,
   postEventsCallback,
@@ -90,7 +90,7 @@ app.get(
 
 //NOTES
 app.get("/users/:userid/notes", jwtMiddleWare, getNotesCallback);
-app.post("/users/:userid/notes", jwtMiddleWare, postNotesCallback);
+app.put("/users/:userid/notes", jwtMiddleWare, putNotesCallback);
 app.delete("/users/:userid/notes/:noteid", jwtMiddleWare, deleteNotesCallback);
 
 //recent notes
@@ -99,7 +99,7 @@ app.post("/users/:userid/notes/recent", jwtMiddleWare, postRecentNotesCallback);
 
 //POMODORO
 app.get(
-  "/users/:userid/pomodoro/pomodoroinfo",
+  "/users/:userid/pomodoro/pomodoroinfo/:pomodoroid",
   jwtMiddleWare,
   getPomodoroCallback
 );

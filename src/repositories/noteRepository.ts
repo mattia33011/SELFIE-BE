@@ -5,17 +5,17 @@ import {Note} from "../types/event";
 class NoteRepository extends Repository {
     private readonly notes: Collection;
 
+    constructor() {
+        super("notes");
+        this.notes = this.collection
+    }
+
     deleteNote(noteID: string, userID: string) {
         return this.notes.deleteOne({
             $and: [{_id: new ObjectId(noteID)}, {userID: userID}] 
         })
     }
     
-
-    constructor() {
-        super("notes");
-        this.notes = this.collection
-    }
 async findByUser(username: string): Promise<Note[]> {
     const note= this.notes.find({
         $or: [{ author: username }, { members: username }]
