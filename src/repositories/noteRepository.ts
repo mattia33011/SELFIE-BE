@@ -10,12 +10,51 @@ class NoteRepository extends Repository {
         this.notes = this.collection
     }
 
-    deleteNote(noteID: string, userID: string) {
-        return this.notes.deleteOne({
-            $and: [{_id: new ObjectId(noteID)}, {userID: userID}] 
-        })
+async deleteNote(noteID: string, userIdentifier: string): Promise<{ success: boolean, deletedCount: number }> {
+    try {
+        // Validate inputs
+        if (!noteID) {
+            throw new Error('Note ID is required');
+        }
+
+        if (!ObjectId.isValid(noteID)) {
+            throw new Error(`Invalid noteID format: ${noteID}`);
+        }
+
+        const noteObjectId = new ObjectId(noteID);
+
+        // First remove from any parent's children array
+        await this.notes.updateMany(
+            { "children._id": noteObjectId },
+            { $pull: { children: { _id: noteObjectId } } as any}
+        );
+
+        // Then delete the note itself and all its children recursively
+        const deleteChildrenRecursive = async (parentId: ObjectId) => {
+            const children = await this.notes.find({ parent: parentId }).toArray();
+            for (const child of children) {
+                await deleteChildrenRecursive(child._id);
+                await this.notes.deleteOne({ _id: child._id });
+            }
+        };
+
+        await deleteChildrenRecursive(noteObjectId);
+        const deleteResult = await this.notes.deleteOne({ _id: noteObjectId });
+
+        if (deleteResult.deletedCount === 0) {
+            throw new Error('Note not found');
+        }
+
+        return {
+            success: true,
+            deletedCount: deleteResult.deletedCount
+        };
+    } catch (error) {
+        console.error(`Error deleting note ${noteID}:`, error);
+        throw error;
     }
-    
+}
+ 
 async findByUser(username: string): Promise<Note[]> {
     const note= this.notes.find({
         $or: [{ author: username }, { members: username }]
@@ -26,8 +65,6 @@ async findByUser(username: string): Promise<Note[]> {
     return (await note).map(doc => ({
         _id: doc._id, // Mantieni l'ObjectId originale
         label: doc.label, // Prendi quello che c'è (può essere undefined)
-        author: doc.author,
-        members: doc.members,
         expanded: doc.expanded,
         content: doc.content,
         icon: doc.icon,
@@ -35,12 +72,13 @@ async findByUser(username: string): Promise<Note[]> {
         type: doc.type,
         parent: doc.parent,
         droppableNode: doc.droppableNode,
-        lastEdit: doc.lastEdit
+        lastEdit: doc.lastEdit,
     }));
 }
 
 async saveNote(event: any, userID: string) {
     const note = event["0"]; // Estrai la nota vera
+    console.log(note);
     return this.notes.insertOne({ ...note, userID });
 }
 
@@ -52,8 +90,7 @@ async readNote(userID: string) {
         .map(doc => ({
             _id: doc._id,
             label: doc.label,
-            author: doc.author,
-            members: doc.members,
+
             expanded: doc.expanded,
             content: doc.content,
             icon: doc.icon,
