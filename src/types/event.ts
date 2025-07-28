@@ -35,17 +35,16 @@ export type Notes = Note[]
 
 export type Note = {
     label: string;
-    author: string;
-    members: string[];
     expanded: boolean;
     content: string;
     icon: string;
-    children: Note[];
+    children: ObjectId[];
     type: 'note' | 'folder';
-    parent: Note | string | null;
+    parent: string | null | ObjectId;
     droppableNode: boolean;
     lastEdit: Date;
-    _id?: ObjectId; // Usa ObjectId invece di string
+    _id?: ObjectId;
+    data?: string;
 };
 
 export type Pomodoro = {

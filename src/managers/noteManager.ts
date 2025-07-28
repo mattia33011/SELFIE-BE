@@ -3,24 +3,39 @@ import noteRepository from "../repositories/noteRepository";
 import {Note, Notes} from "../types/event";
 
 class NoteManager {
-public async fetchNotes(userID: string): Promise<Notes> {
-    const user = await userRepository.read(userID);
-    if (!user) {
-        throw new Error('User not found');
+    public async fetchNotes(userID: string): Promise<Notes> {
+        const user = await userRepository.read(userID);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const notes = await noteRepository.readNote(user.username);
+        
+        return notes
+
     }
-
-    const notes = await noteRepository.readNote(user.username);
-    
-    return notes
-
-}
     public async insertNote(note: Note, userID: string): Promise<boolean> {
         return noteRepository.saveNote(note, userID).then(it => it.acknowledged)
     }
-    async deleteNote(noteID: string, userID: string): Promise<boolean> {
-        return noteRepository.deleteNote(noteID, userID).then(it => it.deletedCount === 1)
-    }
 
+    async deleteNote(noteID: string, userIdentifier: string) {
+        try {
+            const result = await noteRepository.deleteNote(noteID, userIdentifier);
+            
+            if (!result.success || result.deletedCount === 0) {
+                throw new Error("Note not found or already deleted");
+            }
+
+            return {
+                status: "success",
+                message: "Note deleted successfully",
+                deletedCount: result.deletedCount
+            };
+        } catch (error) {
+            console.error(`[NoteManager] Error deleting note ${noteID}:`, error);
+            throw new Error(`Failed to delete note: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
 
     public async fetchRecentNotes(userID: string): Promise<Notes> {
         return noteRepository
@@ -29,8 +44,6 @@ public async fetchNotes(userID: string): Promise<Notes> {
                 console.log(notes);
                 return notes.map<Note>(note  => ({
                     label: note.label,
-                    author: note.author,
-                    members: note.members,
                     expanded: note.expanded,
                     content: note.content,
                     icon: note.icon,

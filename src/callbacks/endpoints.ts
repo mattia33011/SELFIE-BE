@@ -175,7 +175,6 @@ export const putNotesCallback: RequestHandler = async (req, res, next) => {
   const { email } = req?.user;
 
   const body = req.body;
-
   try{
       const note = await noteManager.insertNote(body, email);
       res.status(200).json(note);
@@ -187,13 +186,24 @@ export const putNotesCallback: RequestHandler = async (req, res, next) => {
 export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
   const noteId = req.params.noteid;
   const userId = req.params.userid;
-  try{
-    const data = await noteManager.deleteNote(noteId, userId);
-    res.status(200).json("note deleted successfully");
-  }catch (e: any) {
+  
+  if (!noteId || !userId) {
+    return next(getSelfieError("NOTE_400", 400, "Missing note ID or user ID"));
+  }
+
+  try {
+    const result = await noteManager.deleteNote(noteId, userId);
+    if (result.deletedCount === 0) {
+      return next(getSelfieError("NOTE_404", 404, "Note not found"));
+    }
+    res.status(200).json({
+      success: true,
+      deletedCount: result.deletedCount
+    });
+  } catch (e: any) {
     return next(e);
   }
-}
+};
 
 //array di note recenti
 export const getRecentNotesCallback: RequestHandler = async (
@@ -273,6 +283,7 @@ export const postPomodoroCallback: RequestHandler = async (req, res, next) => {
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
   //@ts-ignore
   const body = req.body as Pomodoro;
+
   const userId=req.params.userid;
 
   try{
