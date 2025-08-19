@@ -42,6 +42,9 @@ import {
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
 import path from 'path';
+import emailManager from "./managers/emailManager";
+import templateRepository from "./repositories/templateRepository";
+import templateManager from "./managers/templateManager";
 
 const app: Express = express();
 
@@ -180,7 +183,12 @@ checkDbConnection().then((it) => {
     throw new Error("MongoDB connection refused");
   }
 
+  //TODO generate all the email templates
+  console.log("generating templates")
+  templateManager.initTemplate()
+  console.log("templates initiliazed")
+
   app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+    console.log(`[server]: Server is running at ${port}`);
   });
 });
