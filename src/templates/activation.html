@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attiva il tuo account Selfie</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0ead2;
+            color: #6c584c;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(108, 88, 76, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #adc178 0%, #dde5b6 100%);
+            padding: 40px 30px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #6c584c;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(108, 88, 76, 0.2);
+        }
+        
+        .header-subtitle {
+            font-size: 16px;
+            color: #6c584c;
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 40px 30px;
+            line-height: 1.6;
+        }
+        
+        .welcome-text {
+            font-size: 24px;
+            color: #6c584c;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .description {
+            font-size: 16px;
+            color: #a98467;
+            margin-bottom: 30px;
+        }
+        
+        .activation-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #adc178 0%, #6c584c 100%);
+            color: #f0ead2;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(173, 193, 120, 0.3);
+        }
+        
+        .activation-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(173, 193, 120, 0.4);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .info-box {
+            background-color: #dde5b6;
+            border-left: 4px solid #adc178;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .info-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #6c584c;
+        }
+        
+        .footer {
+            background-color: #6c584c;
+            color: #f0ead2;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            margin-top: 20px;
+        }
+        
+        .footer-links a {
+            color: #dde5b6;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        
+        .footer-links a:hover {
+            color: #adc178;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, #dde5b6, #adc178, #dde5b6);
+            margin: 30px 0;
+            border-radius: 1px;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 28px;
+            }
+            
+            .welcome-text {
+                font-size: 20px;
+            }
+            
+            .activation-button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Selfie</div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <h1 class="welcome-text">Benvenuto su Selfie!</h1>
+            
+            <p class="description">
+                Ciao <strong>{{nome_utente}}</strong>,<br><br>
+                Siamo felici di averti nella nostra community! Per completare la registrazione 
+                e iniziare a utilizzare tutte le funzionalità di Selfie, devi attivare il tuo account.
+            </p>
+            
+            <div class="button-container">
+                <a href="{{link_attivazione}}" class="activation-button">
+                    Attiva il mio account
+                </a>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>Nota importante:</strong> Questo link di attivazione scadrà tra 24 ore. 
+                Se non riesci ad attivare il tuo account entro questo termine, dovrai registrarti nuovamente.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p style="font-size: 14px; color: #a98467;">
+                Se non riesci a cliccare sul pulsante sopra, copia e incolla questo link nel tuo browser:<br>
+                <span style="color: #adc178; word-break: break-all;">{{link_attivazione}}</span>
+            </p>
+            
+            <p style="font-size: 14px; color: #a98467; margin-top: 30px;">
+                Se non hai richiesto questa registrazione, puoi ignorare questa email. 
+                Il tuo account non verrà attivato senza la tua conferma.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Team Selfie</strong></p>
+            <p>Grazie per aver scelto Selfie per condividere i tuoi momenti speciali!</p>
+            
+            <p style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
+                © 2025 Selfie. Tutti i diritti riservati.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

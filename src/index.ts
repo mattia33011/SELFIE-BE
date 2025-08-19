@@ -184,10 +184,9 @@ checkDbConnection().then((it) => {
   }
 
   //TODO generate all the email templates
-  console.log("generating templates")
-  templateManager.initTemplate()
-  console.log("templates initiliazed")
-
+  templateManager.initTemplateAsync()
+  
+  
   app.listen(port, () => {
     console.log(`[server]: Server is running at ${port}`);
   });

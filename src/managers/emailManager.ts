@@ -1,9 +1,10 @@
 import Nodemailer, { Transporter } from "nodemailer";
 import templateRepository from "../repositories/templateRepository";
+import { getSelfieError } from "../types/errors";
 
 enum EmailTemplate {
-  "SEND_MESSAGE" = "SEND_MESSAGE",
-  "prova" = "prova"
+  "SEND_MESSAGE" = "send-message",
+  "ACTIVATION" = "activation"
 }
 
 class EmailManager {
@@ -44,18 +45,22 @@ class EmailManager {
     template: EmailTemplate
   ) {
 
-    let templateHtml = (await templateRepository.getTemplateByName(template.toString())).content
+    let templateHtml = (await templateRepository.getTemplateByName(template.toString()))!.content
 
     variables.forEach((it) => {
       templateHtml = templateHtml.replace(`{{${it.name}}}`, it.value)
     })
-
-    return this.transport.sendMail({
-      from: this.sender,
-      to: recipientsToString(recipients),
-      subject: subject,
-      html: templateHtml
-    })
+    console.log("Sending email...")
+    try{
+      return this.transport.sendMail({
+        from: this.sender,
+        to: recipientsToString(recipients),
+        subject: subject,
+        html: templateHtml
+      })
+    } catch(e: any){
+      throw getSelfieError("EMAIL_001", 502, "Email cannot be sent, try later")
+    }
 
   }
 }
