@@ -10,3 +10,5 @@ npx esbuild src/index.ts   --bundle   --platform=node   --target=node22   --outf
 ```
 then it will generate the folder dist with a file named "index.js" this is the only entry point of the backend
 copy it in the project with the frontend folder and start gocker node-22 server.
+
+make sure that in the same root of the generated index.js there is a folder in "src/templates" with all the template html files
