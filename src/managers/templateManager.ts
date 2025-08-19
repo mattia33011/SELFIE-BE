@@ -45,7 +45,7 @@ class TemplateManager {
 
       // Salva tutti i template nella mappa
       templates.forEach(({ filename, content }) => {
-        templateRepository.insertIfNotExists({
+        templateRepository.upsert({
             name: filename,
             content: content
         })

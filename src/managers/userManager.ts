@@ -8,6 +8,7 @@ import { Recipient } from "mailersend";
 import crypto from "crypto";
 import { Binary } from "mongodb";
 import { getSelfieError } from "../types/errors";
+import emailManager from "./emailManager";
 
 const generateUnivokeToken = () => crypto.randomBytes(32).toString("hex");
 
@@ -32,19 +33,15 @@ class UserManager {
     const activationToken = generateUnivokeToken();
     await this.insertUser(user, activationToken);
 
-    //await this.sendActivationEmail(user,activationToken)
+    await this.sendActivationEmail(user)
   }
-  // Unused
-  async sendActivationEmail(user: User, activationToken: string) {
-    //try {
-    //  await emailManager.sendActivateAccount(
-    //    new Recipient(user.email, `${user.firstName} ${user.lastName}`),
-    //    activationToken
-    //  );
-    //} catch (e: any) {
-    //  await this.deleteAccount(user.email);
-    //  throw e;
-    //}
+  
+  async sendActivationEmail(user: User) {
+   try{
+    await emailManager.sendActivationEmail(user.email, `${user.firstName} ${user.lastName}`)
+   }catch(e: any){
+    console.error("There is a problem sending activation email for user "+ user.email)
+   }
   }
 
   async deleteAccount(userID: string) {

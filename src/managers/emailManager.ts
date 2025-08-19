@@ -38,6 +38,11 @@ class EmailManager {
     );
   }
 
+  async sendActivationEmail(recipient: string, name: string){
+    const variables = [{name: "accountName", value: name}]
+    return this.send([recipient], "Selfie - Registration new account", variables, EmailTemplate.ACTIVATION)
+  }
+
   private async send(
     recipients: string[],
     subject: string,

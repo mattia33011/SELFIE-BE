@@ -14,12 +14,8 @@ class TemplateRepository extends Repository {
     this.templates.insertOne(template);
   }
 
-  public async insertIfNotExists(template: Template) {
-    const exist = await this.getTemplateByName(template.name)
-    if(exist)
-      return;
-     
-    this.insert(template);
+  public async upsert(template: Template) {
+     await this.templates.updateOne({name: template.name}, {$set: template}, {upsert: true})
   }
   public async getTemplateByName(
     name: string
