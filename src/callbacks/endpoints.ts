@@ -497,7 +497,7 @@ export const postEventsCallback: RequestHandler = async (req, res, next) => {
       getSelfieError("EVENT_003", 500, "ops, there was an error, try later")
     );
   }
-  
+
 };
 
 export const putEventsCallback: RequestHandler = async (req, res, next) => {
@@ -549,8 +549,6 @@ export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
 };
 
 
-
-//Projects callbacks
 export const saveProjectCallback: RequestHandler = async (
   req,
   res,
@@ -632,143 +630,6 @@ try {
 }
 };
 
-
-//Projects callbacks
-
-
-
-//Projects callbacks
-export const saveProjectCallback: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
-const body = req.body as ProjectCreateRequest
-const userId = req.params.userid
-try{
-  const data = await projectManager.saveProject(userId, body);
-  res.status(200).json("Project Saved successfully");
-} catch (e: any) {
-  return next(
-      getSelfieError("PROJECT_500", 500, "Internal server error, try again later").toJSON()
-  );
-}
-}
-
-export const addProjectTaskCallback: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
-const userId = req.params.userid
-const projectId = req.body.projectId
-const task = req.body.task
-try{
-  const project = await projectManager.addTask(userId,projectId,task)
-  res.status(200).json(project);
-} catch (e: any) {
-  return next(e)
-}
-}
-
-export const updateProjectCallback: RequestHandler = async (req, res, next) => {
-const project = req.body.project as Project;
-const userid = req.params.userid;
-try {
-  await projectManager.updateProject(userid, project);
-  res.status(200).json("Project updated successfully");
-} catch (e: any) {
-  return next(e);
-}
-};
-
-export const fetchProjectsCallback: RequestHandler = async (req, res, next) => {
-const userId = req.params.userid
-try {
-  const data = await projectManager.fetchUserProjects(userId);
-  if (data.length == 0) {
-    return next(
-        getSelfieError("PROJECT_404", 404 , "No project found")
-    );
-  }
-  res.status(200).json(data);
-} catch (e: any) {
-  return next(e);
-}
-};
-
-export const filterProjectsCallback: RequestHandler = async (req, res, next) => {
-const filter = req.body as Partial<Project>
-const userId = req.params.userid;
-try {
-  const data = await projectManager.findWithFilter(userId, filter)
-  res.status(200).json(data);
-} catch (e: any) {
-  return next(e);
-}
-};
-
-export const deleteProjectCallback: RequestHandler = async (req, res, next) => {
-const projectid = req.params.projectid;
-const userid = req.params.userid;
-try {
-  const data = await projectManager.deleteProject(userid, projectid);
-  res.status(200).json("Project deleted successfully");
-} catch (e: any) {
-  return next(e);
-}
-};
-
-
-//Projects callbacks
-
-export const putEventsCallback: RequestHandler = async (req, res, next) => {
-  //@ts-ignore
-  if (!req.user?.email)
-    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
-
-  //@ts-ignore
-  const { email } = req.user;
-  const _id = req.params.eventid;
-  const body = req.body;
-
-  if (_id == undefined || !isEvent(body)) {
-    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
-  }
-
-  try {
-    const updatedId = await eventManager.update(_id, email, body);
-    
-    res.status(200).send(updatedId);
-  } catch (err) {
-    return next(err);
-  }
-};
-
-
-export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
-  //@ts-ignore
-  if (!req.user?.email)
-    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
-
-  //@ts-ignore
-  const { email } = req.user;
-  const _id = req.params.eventid;
-
-  if (_id == undefined) {
-    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
-  }
-
-  try {
-    const isDeleted = await eventManager.delete(_id, email);
-    if (!isDeleted)
-      return next(getSelfieError("EVENT_004", 404, "Event not found"));
-
-    res.status(200).send("");
-  } catch (err) {
-    return next(err);
-  }
-};
 
 
 
