@@ -38,6 +38,9 @@ import {
   autoSuggestUsersCallback,
   updateProjectCallback,
   addProjectTaskCallback,
+  getToday,
+  setToday,
+  resetToday,
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -167,6 +170,10 @@ app.delete(
 
 //SUGGEST
 app.post("/users/:userid/search", jwtMiddleWare, autoSuggestUsersCallback);
+
+app.get("/time", getToday)
+app.post("/time", setToday)
+app.post("/time/reset", resetToday)
 
 // Middleware to catch every unhandled error
 app.use(errorHandler);

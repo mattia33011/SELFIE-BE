@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import userManager from "../managers/userManager";
 import userRepository from "../repositories/userRepository";
 import { User, isValidUser } from "../types/user";
-import {getSelfieError, SelfieError} from "../types/errors";
+import { getSelfieError, SelfieError } from "../types/errors";
 import { noteManager } from "../managers/noteManager";
 import { eventManager } from "../managers/eventManager";
 import { pomodoroManager } from "../managers/pomodoroManager";
@@ -23,8 +23,9 @@ import { convertNumericObjectToArray } from "../utils";
 import { ObjectId } from "mongodb";
 
 import ProjectRepository from "../repositories/projectRepository";
-import {Project, ProjectCreateRequest} from "../types/project";
-import {projectManager, ProjectManager} from "../managers/projectManager";
+import { Project, ProjectCreateRequest } from "../types/project";
+import { projectManager, ProjectManager } from "../managers/projectManager";
+import timeMachine from "../managers/timeMachine";
 
 export const loginCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
@@ -140,8 +141,12 @@ export const getProfilePictureCallback: RequestHandler = async (
   res.end();
 };
 
-export const autoSuggestUsersCallback: RequestHandler = async (req, res, next) => {
-  const userId = req.params.userid
+export const autoSuggestUsersCallback: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const userId = req.params.userid;
   const partialUsername = req.body.partialUsername;
   try {
     const data = await userManager.autoSuggestName(partialUsername, userId);
@@ -158,15 +163,15 @@ export const getNotesCallback: RequestHandler = async (req, res, next) => {
 
   //@ts-ignore
   const userId = req.user.userid;
-  try{
+  try {
     const data = await noteManager.fetchNotes(userId);
-    if(data.length == 0) {
+    if (data.length == 0) {
       return next(getSelfieError("NOTE_404", 404, "No notes found"));
     }
     res.status(200).json(data);
-    } catch (e: any) {
-      return next(e);
-    }
+  } catch (e: any) {
+    return next(e);
+  }
 };
 
 export const putNotesCallback: RequestHandler = async (req, res, next) => {
@@ -177,9 +182,9 @@ export const putNotesCallback: RequestHandler = async (req, res, next) => {
   const { email } = req?.user;
 
   const body = req.body;
-  try{
-      const note = await noteManager.insertNote(body, email);
-      res.status(200).json(note);
+  try {
+    const note = await noteManager.insertNote(body, email);
+    res.status(200).json(note);
   } catch (e: any) {
     return next(e);
   }
@@ -188,7 +193,7 @@ export const putNotesCallback: RequestHandler = async (req, res, next) => {
 export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
   const noteId = req.params.noteid;
   const userId = req.params.userid;
-  
+
   if (!noteId || !userId) {
     return next(getSelfieError("NOTE_400", 400, "Missing note ID or user ID"));
   }
@@ -200,7 +205,7 @@ export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
     }
     res.status(200).json({
       success: true,
-      deletedCount: result.deletedCount
+      deletedCount: result.deletedCount,
     });
   } catch (e: any) {
     return next(e);
@@ -271,7 +276,6 @@ export const getPomodoroCallback: RequestHandler = async (req, res, next) => {
   const userId = req.params.userid;
   const pomodoroId = req.params.pomodoroid;
   try {
-    
     const data = await pomodoroManager.fetchPomodoro(userId, pomodoroId);
     res.status(200).json(data);
   } catch (e: any) {
@@ -286,9 +290,9 @@ export const postPomodoroCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore
   const body = req.body as Pomodoro;
 
-  const userId=req.params.userid;
+  const userId = req.params.userid;
 
-  try{
+  try {
     await pomodoroManager.save(body, userId);
     res.status(200).json("Pomodoro updated successfully");
   } catch (e: any) {
@@ -398,7 +402,7 @@ export const postTasksCallback: RequestHandler = async (req, res, next) => {
   try {
     const data = await pomodoroManager.insertTask(body, email);
     console.log(data);
-    
+
     if (!data) {
       return next(
         getSelfieError("NOTE_003", 500, "ops, there was an error, try later")
@@ -497,7 +501,6 @@ export const postEventsCallback: RequestHandler = async (req, res, next) => {
       getSelfieError("EVENT_003", 500, "ops, there was an error, try later")
     );
   }
-
 };
 
 export const putEventsCallback: RequestHandler = async (req, res, next) => {
@@ -516,13 +519,12 @@ export const putEventsCallback: RequestHandler = async (req, res, next) => {
 
   try {
     const updatedId = await eventManager.update(_id, email, body);
-    
+
     res.status(200).send(updatedId);
   } catch (err) {
     return next(err);
   }
 };
-
 
 export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore
@@ -548,88 +550,113 @@ export const deleteEventsCallback: RequestHandler = async (req, res, next) => {
   }
 };
 
-
-export const saveProjectCallback: RequestHandler = async (
-  req,
-  res,
-  next,
-) => {
-const body = req.body as ProjectCreateRequest
-const userId = req.params.userid
-try{
-  const data = await projectManager.saveProject(userId, body);
-  res.status(200).json("Project Saved successfully");
-} catch (e: any) {
-  return next(
-      getSelfieError("PROJECT_500", 500, "Internal server error, try again later").toJSON()
-  );
-}
-}
+export const saveProjectCallback: RequestHandler = async (req, res, next) => {
+  const body = req.body as ProjectCreateRequest;
+  const userId = req.params.userid;
+  try {
+    const data = await projectManager.saveProject(userId, body);
+    res.status(200).json("Project Saved successfully");
+  } catch (e: any) {
+    return next(
+      getSelfieError(
+        "PROJECT_500",
+        500,
+        "Internal server error, try again later"
+      ).toJSON()
+    );
+  }
+};
 
 export const addProjectTaskCallback: RequestHandler = async (
   req,
   res,
-  next,
+  next
 ) => {
-const userId = req.params.userid
-const projectId = req.body.projectId
-const task = req.body.task
-try{
-  const project = await projectManager.addTask(userId,projectId,task)
-  res.status(200).json(project);
-} catch (e: any) {
-  return next(e)
-}
-}
+  const userId = req.params.userid;
+  const projectId = req.body.projectId;
+  const task = req.body.task;
+  try {
+    const project = await projectManager.addTask(userId, projectId, task);
+    res.status(200).json(project);
+  } catch (e: any) {
+    return next(e);
+  }
+};
 
 export const updateProjectCallback: RequestHandler = async (req, res, next) => {
-const project = req.body.project as Project;
-const userid = req.params.userid;
-try {
-  await projectManager.updateProject(userid, project);
-  res.status(200).json("Project updated successfully");
-} catch (e: any) {
-  return next(e);
-}
+  const project = req.body.project as Project;
+  const userid = req.params.userid;
+  try {
+    await projectManager.updateProject(userid, project);
+    res.status(200).json("Project updated successfully");
+  } catch (e: any) {
+    return next(e);
+  }
 };
 
 export const fetchProjectsCallback: RequestHandler = async (req, res, next) => {
-const userId = req.params.userid
-try {
-  const data = await projectManager.fetchUserProjects(userId);
-  if (data.length == 0) {
-    return next(
-        getSelfieError("PROJECT_404", 404 , "No project found")
-    );
+  const userId = req.params.userid;
+  try {
+    const data = await projectManager.fetchUserProjects(userId);
+    if (data.length == 0) {
+      return next(getSelfieError("PROJECT_404", 404, "No project found"));
+    }
+    res.status(200).json(data);
+  } catch (e: any) {
+    return next(e);
   }
-  res.status(200).json(data);
-} catch (e: any) {
-  return next(e);
-}
 };
 
-export const filterProjectsCallback: RequestHandler = async (req, res, next) => {
-const filter = req.body as Partial<Project>
-const userId = req.params.userid;
-try {
-  const data = await projectManager.findWithFilter(userId, filter)
-  res.status(200).json(data);
-} catch (e: any) {
-  return next(e);
-}
+export const filterProjectsCallback: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const filter = req.body as Partial<Project>;
+  const userId = req.params.userid;
+  try {
+    const data = await projectManager.findWithFilter(userId, filter);
+    res.status(200).json(data);
+  } catch (e: any) {
+    return next(e);
+  }
 };
 
 export const deleteProjectCallback: RequestHandler = async (req, res, next) => {
-const projectid = req.params.projectid;
-const userid = req.params.userid;
-try {
-  const data = await projectManager.deleteProject(userid, projectid);
-  res.status(200).json("Project deleted successfully");
-} catch (e: any) {
-  return next(e);
-}
+  const projectid = req.params.projectid;
+  const userid = req.params.userid;
+  try {
+    const data = await projectManager.deleteProject(userid, projectid);
+    res.status(200).json("Project deleted successfully");
+  } catch (e: any) {
+    return next(e);
+  }
 };
 
+export const getToday: RequestHandler = async (req, res, next) => {
+  try {
+    res.status(200).json({ today: timeMachine.getToday() });
+  } catch (e: any) {
+    return next(e);
+  }
+};
 
+export const setToday: RequestHandler = async (req, res, next) => {
+  try {
+    const body = req.body as { date: Date };
+    console.log(body)
+    timeMachine.setToday(body.date);
+    res.status(204).end();
+  } catch (e: any) {
+    return next(e);
+  }
+};
 
-
+export const resetToday: RequestHandler = async (req, res, next) => {
+  try {
+    timeMachine.resetToday();
+    res.status(204).end();
+  } catch (e: any) {
+    return next(e);
+  }
+};

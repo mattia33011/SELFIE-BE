@@ -1,6 +1,7 @@
 import {Repository} from "./repository";
 import {Collection, ObjectId} from "mongodb";
 import {CalendarEvent, Note} from "../types/event";
+import timeMachine from "../managers/timeMachine";
 
 class EventRepository extends Repository {
     private readonly events: Collection;
@@ -21,7 +22,7 @@ class EventRepository extends Repository {
         return this.events.find({$and: [{userID: userID}]}).toArray();
     }
     async updateNote(noteID: ObjectId, note: Note) {
-        return this.events.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: new Date()}});
+        return this.events.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: timeMachine.getToday()}});
     }
     async readEvent(eventID: ObjectId){
         return this.events.findOne({_id:eventID})

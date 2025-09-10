@@ -1,6 +1,7 @@
 import {Repository} from "./repository";
 import {Collection, ObjectId} from "mongodb";
 import {Note} from "../types/event";
+import timeMachine from "../managers/timeMachine";
 
 class NoteRepository extends Repository {
     private readonly notes: Collection;
@@ -103,7 +104,7 @@ async readNote(userID: string) {
 }
 
     async updateNote(noteID: ObjectId, note: Note) {
-        return this.notes.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: new Date()}});
+        return this.notes.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: timeMachine.getToday()}});
     }
     async readRecentNote(userID: string) {
         return this.notes.find({userID: userID}).sort({lastEdit: -1}).limit(5).toArray();
