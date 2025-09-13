@@ -15,6 +15,7 @@ import {
   resetPasswordCallback,
   getNotesCallback,
   putNotesCallback,
+  moveNotesCallback,
   deleteNotesCallback,
   getEventsCallback,
   postEventsCallback,
@@ -98,6 +99,7 @@ app.get(
 app.get("/users/:userid/notes", jwtMiddleWare, getNotesCallback);
 app.put("/users/:userid/notes", jwtMiddleWare, putNotesCallback);
 app.delete("/users/:userid/notes/:noteid", jwtMiddleWare, deleteNotesCallback);
+app.patch("/users/:userid/notes/:folderid/:noteid", jwtMiddleWare, moveNotesCallback);
 
 //recent notes
 app.get("/users/:userid/notes/recent", jwtMiddleWare, getRecentNotesCallback);

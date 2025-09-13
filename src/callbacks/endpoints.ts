@@ -212,6 +212,28 @@ export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const moveNotesCallback: RequestHandler = async (req, res, next) => {
+  const noteId = req.params.noteid;
+  const folderId = req.params.folderid;
+  const userId = req.params.userid;
+  if (!noteId || !folderId || !userId) {
+    return next(getSelfieError("NOTE_400", 400, "Missing note ID or folder ID or user ID"));
+  }
+  try{
+    const result = await noteManager.moveNote(noteId, folderId, userId);
+    if (!result) {
+      return next(getSelfieError("NOTE_404", 404, "Note or folder not found"));
+    }
+    res.status(200).json({
+      success: true,
+      moved: result,
+    });
+  } catch (e: any) {
+    return next(e);
+  }
+
+  }
+
 //array di note recenti
 export const getRecentNotesCallback: RequestHandler = async (
   req,

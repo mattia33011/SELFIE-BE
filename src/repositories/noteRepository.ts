@@ -102,7 +102,9 @@ async readNote(userID: string) {
             lastEdit: doc.lastEdit
         }));
 }
-
+    async readNoteById(noteID: string) {
+        return this.notes.findOne({ _id: new ObjectId(noteID) });
+    }
     async updateNote(noteID: ObjectId, note: Note) {
         return this.notes.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: timeMachine.getToday()}});
     }
