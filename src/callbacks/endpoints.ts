@@ -8,6 +8,7 @@ import { eventManager } from "../managers/eventManager";
 import { pomodoroManager } from "../managers/pomodoroManager";
 import {
   Pomodoro,
+  StudyPlan,
   StudySession,
   Task,
   isEvent,
@@ -15,6 +16,7 @@ import {
   isNoteList,
   isPomodoro,
   isSession,
+  isStudyPlan,
   isTask,
 } from "../types/event";
 import { nextTick } from "process";
@@ -372,6 +374,51 @@ export const deleteStudySessionsCallback: RequestHandler = async (
   res.status(200).send("");
 };
 
+export const getStudyPlanCallback: RequestHandler = async (req, res, next)=>{
+  if(!req.params.userid)
+        return next(getSelfieError("DEU_001", 400, "Provide userID"));
+  //@ts-ignore
+  const { email } = req?.user;
+
+  try {
+    const data = await pomodoroManager.fetchStudyPlan(email);
+    res.status(200).json(data);
+  } catch (e: any) {
+    return next(getSelfieError("NOTE_001", 404, "Plans not found"));
+  }
+  
+}
+
+
+
+export const putStudyPlanCallback: RequestHandler =async (req, res, next)=>{
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+
+  const body = (req.body) as StudyPlan;
+  if (!body || !isStudyPlan(body)) {
+    return next(getSelfieError("NOTE_002", 400, "Body is invalid"));
+  }
+  try {
+    const data = await pomodoroManager.insertStudyPlan(body, email);
+
+    console.log(data);
+    if (!data) {
+      return next(
+        getSelfieError("PLAN_002", 500, "Error data")
+      );
+    }
+
+    res.status(200).json(data);
+  } catch (e: any) {
+    return next(
+      getSelfieError("PLAN_003", 500, "ops, there was an error, try later")
+    );
+  }
+}
 //mi da la lista di task
 export const getTasksCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore

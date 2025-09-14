@@ -99,7 +99,31 @@ export function isTask(task: any): task is Task {
     return "taskName" in task && "taskStatus" in task && "taskCompleted" in task;
 }
 
+export function isStudyPlan(plan: any): plan is StudyPlan{
+    if(plan === null) return false;
+    return "settings" in plan &&  "plan" in plan && "totalTime" in plan && "days" in plan;
+}
+
 export type EventDB = Event | Note & {
     userID: string
 }
 
+export type StudyStep={
+  step: number,
+  type: 'pomodoro' | 'shortBreak' | 'longBreak',
+  duration: number
+}
+export type dayInfo={
+  day: Date;
+  step: number;
+}
+
+
+export type StudyPlan={
+  settings: Pomodoro,
+  plan: StudyStep[],
+  totalTime: number;
+  days: dayInfo[],
+  _id?: ObjectId,
+}
+export type StudyPlans = StudyPlan[];

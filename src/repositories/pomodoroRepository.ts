@@ -1,23 +1,26 @@
 import { Repository } from "./repository";
 import { Collection, ObjectId } from "mongodb";
-import { DBPomorodo, Pomodoro, StudySession, Task, Tasks, StudySessions } from "../types/event";
+import { DBPomorodo, Pomodoro, StudySession, Task, Tasks, StudySessions, StudyPlan } from "../types/event";
 
 class PomodoroRepository extends Repository {
   private readonly pomodoros: Collection;
   private readonly sessions: Collection;
   private readonly tasks: Collection;
+  private readonly plans: Collection;
 
   constructor() {
     super("pomodoros");
     this.pomodoros = this.client.collection("pomodoroinfo");
     this.sessions = this.client.collection("sessions");
     this.tasks = this.client.collection("tasks");
+    this.plans=this.client.collection("plans");
     this._setupCollections();
   }
   async _setupCollections() {
     await this.pomodoros.createIndex({ id: 1 }, { unique: false });
     await this.sessions.createIndex({ id: 1 }, { unique: false });
     await this.tasks.createIndex({ id: 1 }, { unique: false });
+    await this.plans.createIndex({ id: 1 }, { unique: false });
   }
  
   async save(pomodoro: DBPomorodo) {
@@ -50,7 +53,43 @@ class PomodoroRepository extends Repository {
       userID: userID,
     });
   }
-  
+  async readStudyPlan(userID: string){
+    return this.plans.find({userID: userID}).toArray();
+  }
+
+async findStudyPlan(userID: string, plan: StudyPlan): Promise<StudyPlan | null> {
+  if (!plan._id) throw new Error('Plan ID is undefined');
+
+  return this.plans.findOne({
+    _id: new ObjectId(plan._id),
+    userID: userID
+  }) as Promise<StudyPlan | null>;
+}
+
+
+
+
+
+async saveStudyPlan(plan: StudyPlan, userID: string) {
+  if (plan._id) {
+    console.log(plan.days[0].step);
+    const result = await this.plans.updateOne(
+      {userID: userID, _id: new ObjectId(plan._id) }, // <<< converti in ObjectId
+      { $set: { days: plan.days } }
+    );
+    console.log("miau");
+    if (result.matchedCount === 0) {
+      throw new Error('Plan not found for update');
+    }
+    return this.findStudyPlan(userID, plan);
+  } else {
+    const toInsert = { ...plan, userID };
+    const insertResult = await this.plans.insertOne(toInsert);
+    return this.findStudyPlan(userID, { ...plan, _id: insertResult.insertedId });
+  }
+}
+
+
 
   async readTask(userID: string) {
     return this.tasks.find({ userID: userID }).toArray();

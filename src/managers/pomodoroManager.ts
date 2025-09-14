@@ -4,6 +4,7 @@ import {
     DBPomorodo,
   Pomodoro,
   Pomodoros,
+  StudyPlan,
   StudySession,
   StudySessions,
   Task,
@@ -100,6 +101,47 @@ import {
       );
     });
   }
+
+  public async fetchStudyPlan(userIdentifier: string) {
+    // se userIdentifier contiene '@' assumiamo sia già un'email
+    let email: string | undefined = undefined;
+    if (typeof userIdentifier === 'string' && userIdentifier.includes('@')) {
+      email = userIdentifier;
+    } else {
+      const user = await userRepository.read(userIdentifier);
+      email = user?.email;
+    }
+
+    if (!email) {
+      console.log('fetchStudyPlan: no email resolved for', userIdentifier);
+      return []; // niente piani
+    }
+
+    // ora leggiamo i piani salvati con userID = email
+    const records = await PomodoroRepository.readStudyPlan(email);
+    return records.map((plan): StudyPlan => ({
+      settings: plan.settings,
+      plan: plan.plan,
+      totalTime: plan.totalTime ?? plan.TotalTime,
+      days: plan.days,
+      _id: plan._id
+    }));
+  }
+
+
+public async insertStudyPlan(plan: StudyPlan, userID: string): Promise<StudyPlan> {
+  const user = await userRepository.read(userID);
+
+  if (!user) throw new Error('User not found');
+  // Salva o aggiorna il piano e ritorna il piano aggiornato
+  const savedPlan = await PomodoroRepository.saveStudyPlan(plan, userID);
+
+  if (!savedPlan) throw new Error('Errore nel salvataggio del piano');
+  return savedPlan;
+}
+
+
+
   public async insertTask(task: Task[], userID: string): Promise<Tasks> {
     const user = await userRepository.read(userID);
     return PomodoroRepository.saveTask(task, user!.email).then(
