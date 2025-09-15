@@ -140,6 +140,13 @@ public async insertStudyPlan(plan: StudyPlan, userID: string): Promise<StudyPlan
   return savedPlan;
 }
 
+  public async deleteStudyPlan(planID: string, userID: string): Promise<boolean> {
+    const user = await userRepository.read(userID);
+    if (!user) return false;
+    return PomodoroRepository.deletePlan(planID, user.email).then(
+      (it) => it.acknowledged
+    );
+  }
 
 
   public async insertTask(task: Task[], userID: string): Promise<Tasks> {

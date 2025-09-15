@@ -419,6 +419,25 @@ export const putStudyPlanCallback: RequestHandler =async (req, res, next)=>{
     );
   }
 }
+
+export const deleteStudyPlanCallback: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  if (!req.params.userid)
+    return next(getSelfieError("DEU_001", 400, "Provide userID"));
+
+  const isDeleted = await pomodoroManager.deleteStudyPlan(
+    req.params.planid,
+    req.params.userid
+  );
+  if (!isDeleted) return next(getSelfieError("DEU_002", 404, "User not found"));
+
+  res.status(200).send("");
+};
+
+
 //mi da la lista di task
 export const getTasksCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore

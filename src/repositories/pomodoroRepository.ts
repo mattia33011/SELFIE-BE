@@ -77,7 +77,6 @@ async saveStudyPlan(plan: StudyPlan, userID: string) {
       {userID: userID, _id: new ObjectId(plan._id) }, // <<< converti in ObjectId
       { $set: { days: plan.days } }
     );
-    console.log("miau");
     if (result.matchedCount === 0) {
       throw new Error('Plan not found for update');
     }
@@ -88,6 +87,14 @@ async saveStudyPlan(plan: StudyPlan, userID: string) {
     return this.findStudyPlan(userID, { ...plan, _id: insertResult.insertedId });
   }
 }
+
+async deletePlan(planid: string, userID: string) {
+  return this.plans.deleteOne({
+    _id: new ObjectId(planid),
+    userID: userID,
+  });
+}
+
 
 
 

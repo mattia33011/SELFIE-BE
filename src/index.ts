@@ -32,6 +32,7 @@ import {
   deleteStudySessionsCallback,
   getStudyPlanCallback,
   putStudyPlanCallback,
+  deleteStudyPlanCallback,
   deleteTasksCallback,
   saveProjectCallback,
   fetchProjectsCallback,
@@ -42,7 +43,7 @@ import {
   addProjectTaskCallback,
   getToday,
   setToday,
-  resetToday,
+  resetToday
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -110,6 +111,7 @@ app.get("/users/:userid/pomodoro/pomodoroinfo/:pomodoroid", jwtMiddleWare, getPo
 app.put("/users/:userid/pomodoro/pomodoroinfo", jwtMiddleWare, postPomodoroCallback);
 app.get("/users/:userid/pomodoro/studyplan", jwtMiddleWare, getStudyPlanCallback);
 app.put("/users/:userid/pomodoro/studyplan", jwtMiddleWare, putStudyPlanCallback);
+app.delete("/users/:userid/pomodoro/studyplan/:planid", jwtMiddleWare, deleteStudyPlanCallback);
 
 //sessioni passate
 app.get(
