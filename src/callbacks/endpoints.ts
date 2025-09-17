@@ -167,10 +167,24 @@ export const getNotesCallback: RequestHandler = async (req, res, next) => {
   const userId = req.user.userid;
   try {
     const data = await noteManager.fetchNotes(userId);
-    if (data.length == 0) {
-      return next(getSelfieError("NOTE_404", 404, "No notes found"));
-    }
+
     res.status(200).json(data);
+  } catch (e: any) {
+    return next(e);
+  }
+};
+
+export const saveNoteCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const body = req.body.text;
+  const noteid = req.params.noteid;
+
+  try {
+    const note = await noteManager.saveNote(noteid, body);
+    res.status(200).json({ status: "updated" });
   } catch (e: any) {
     return next(e);
   }
@@ -208,6 +222,29 @@ export const deleteNotesCallback: RequestHandler = async (req, res, next) => {
     res.status(200).json({
       success: true,
       deletedCount: result.deletedCount,
+    });
+  } catch (e: any) {
+    return next(e);
+  }
+};
+
+export const moveNotesCallback: RequestHandler = async (req, res, next) => {
+  const noteId = req.params.noteid;
+  const folderId = req.params.folderid;
+  const userId = req.params.userid;
+  if (!noteId || !folderId || !userId) {
+    return next(
+      getSelfieError("NOTE_400", 400, "Missing note ID or folder ID or user ID")
+    );
+  }
+  try {
+    const result = await noteManager.moveNote(noteId, folderId, userId);
+    if (!result) {
+      return next(getSelfieError("NOTE_404", 404, "Note or folder not found"));
+    }
+    res.status(200).json({
+      success: true,
+      moved: result,
     });
   } catch (e: any) {
     return next(e);
@@ -710,7 +747,7 @@ export const getToday: RequestHandler = async (req, res, next) => {
 export const setToday: RequestHandler = async (req, res, next) => {
   try {
     const body = req.body as { date: Date };
-    console.log(body)
+    console.log(body);
     timeMachine.setToday(body.date);
     res.status(204).end();
   } catch (e: any) {

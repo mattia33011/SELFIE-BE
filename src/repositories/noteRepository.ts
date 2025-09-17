@@ -80,7 +80,7 @@ async findByUser(username: string): Promise<Note[]> {
 async saveNote(event: any, userID: string) {
     const note = event["0"]; // Estrai la nota vera
     console.log(note);
-    return this.notes.insertOne({ ...note, userID });
+    return this.notes.insertOne({ ...note, lastEdit: new Date(note.lastEdit), userID });
 }
 
 async readNote(userID: string) {
@@ -100,11 +100,13 @@ async readNote(userID: string) {
             parent: doc.parent,
             droppableNode: doc.droppableNode,
             lastEdit: doc.lastEdit
-        }));
+        }) as Note & {_id: ObjectId});
 }
-
-    async updateNote(noteID: ObjectId, note: Note) {
-        return this.notes.updateOne({$and: [{_id: noteID}]}, {$set: {...note, lastEdit: timeMachine.getToday()}});
+    async readNoteByIdLinkedToUser(noteID: string) {
+        return this.notes.findOne({ _id: new ObjectId(noteID) });
+    }
+    async updateNote(note: Note) {
+        return this.notes.updateOne({$and: [{_id: note._id}]}, {$set: {...note, lastEdit: timeMachine.getToday()}});
     }
     async readRecentNote(userID: string) {
         return this.notes.find({userID: userID}).sort({lastEdit: -1}).limit(5).toArray();
