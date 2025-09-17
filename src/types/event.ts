@@ -38,7 +38,7 @@ export type Note = {
     expanded: boolean;
     content: string;
     icon: string;
-    children: ObjectId[];
+    children: Notes;
     type: 'note' | 'folder';
     parent: string | null | ObjectId;
     droppableNode: boolean;

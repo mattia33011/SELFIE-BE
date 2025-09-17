@@ -42,6 +42,7 @@ import {
   getToday,
   setToday,
   resetToday,
+  saveNoteCallback
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
@@ -100,6 +101,7 @@ app.get("/users/:userid/notes", jwtMiddleWare, getNotesCallback);
 app.put("/users/:userid/notes", jwtMiddleWare, putNotesCallback);
 app.delete("/users/:userid/notes/:noteid", jwtMiddleWare, deleteNotesCallback);
 app.patch("/users/:userid/notes/:folderid/:noteid", jwtMiddleWare, moveNotesCallback);
+app.patch("/users/:userid/notes/:noteid", jwtMiddleWare, saveNoteCallback)
 
 //recent notes
 app.get("/users/:userid/notes/recent", jwtMiddleWare, getRecentNotesCallback);
