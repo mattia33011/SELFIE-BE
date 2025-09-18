@@ -1,6 +1,7 @@
 import {CalendarEvent, Events} from "../types/event";
 import eventRepository from "../repositories/eventRepository";
 import { ObjectId } from "mongodb";
+import timeMachine from "./timeMachine";
 
 class EventManager {
     public async fetchEvents(userID: string): Promise<Events> {
@@ -21,6 +22,27 @@ class EventManager {
                         stato: note.stato,
                     }
                 }))
+            })
+    }
+    public async fetchTodayEvents(userID: string): Promise<Events> {
+        return eventRepository
+            .readEventById(userID)
+            .then(events => {
+                
+                return events.map<CalendarEvent>(event  => ({
+                    title: event.title,
+                    color: event.color,
+                    end: event.end,
+                    start: event.start,
+                    _id: event._id,
+                    rrule: event.rrule,
+                    allDay: event.allDay,
+                    extendedProps: {
+                        luogo: event.luogo,
+                        tipo: event.tipo,
+                        stato: event.stato,
+                    }
+                })).filter(it => new Date(it.end as string)>= timeMachine.getToday() && new Date(it.start as string)<= timeMachine.getToday())
             })
     }
     public async insert(event: CalendarEvent, userID: string): Promise<CalendarEvent> {

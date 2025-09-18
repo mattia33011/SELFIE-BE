@@ -146,6 +146,7 @@ app.delete(
 
 //EVENTS
 app.get("/users/:userid/events", jwtMiddleWare, getEventsCallback);
+app.get("/users/:userid/events/today", jwtMiddleWare, getEventsCallback);
 app.post("/users/:userid/events", jwtMiddleWare, postEventsCallback);
 app.put("/users/:userid/events/:eventid", jwtMiddleWare, putEventsCallback);
 app.delete(

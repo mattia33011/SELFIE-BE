@@ -565,6 +565,20 @@ export const deleteTasksCallback: RequestHandler = async (req, res, next) => {
   res.status(200).send("");
 };
 
+export const getTodayEventsCallback: RequestHandler = async (req, res, next) => {
+  //@ts-ignore
+  if (!req.user?.email)
+    return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
+  //@ts-ignore
+  const { email } = req?.user;
+  try {
+    const data = await eventManager.fetchTodayEvents(email);
+    res.status(200).json(data);
+  } catch (e: any) {
+    return next(getSelfieError("EVENT_001", 404, "Events not found"));
+  }
+};
+
 export const getEventsCallback: RequestHandler = async (req, res, next) => {
   //@ts-ignore
   if (!req.user?.email)
