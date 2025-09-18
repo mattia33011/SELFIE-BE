@@ -164,9 +164,10 @@ export const getNotesCallback: RequestHandler = async (req, res, next) => {
     return next(getSelfieError("SE_001", 401, "Cannot find any logged user"));
 
   //@ts-ignore
-  const userId = req.user.userid;
+  const {email} = req.user;
+
   try {
-    const data = await noteManager.fetchNotes(userId);
+    const data = await noteManager.fetchNotes(email);
 
     res.status(200).json(data);
   } catch (e: any) {

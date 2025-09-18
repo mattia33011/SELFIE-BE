@@ -25,11 +25,8 @@ class NoteManager {
   }
 
   public async fetchNotes(userID: string): Promise<Notes> {
-    const user = await userRepository.read(userID);
-    if (!user) {
-      throw new Error("User not found");
-    }
-    const files = await noteRepository.readNote(user.username);
+    
+    const files = await noteRepository.readNote(userID);
     const fileWithParent = files.filter((it) => it.parent);
     const fileWithoutParent = files.filter((it) => !it.parent);
 

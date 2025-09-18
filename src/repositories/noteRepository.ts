@@ -80,11 +80,11 @@ async findByUser(username: string): Promise<Note[]> {
 async saveNote(event: any, userID: string) {
     const note = event["0"]; // Estrai la nota vera
     console.log(note);
-    return this.notes.insertOne({ ...note, lastEdit: new Date(note.lastEdit), userID });
+    return this.notes.insertOne({ ...note, lastEdit: new Date(note.lastEdit), userID: userID });
 }
 
-async readNote(userID: string) {
-    const notes = await this.notes.find({ user: userID }).toArray();
+async readNote(email: string) {
+    const notes = await this.notes.find({ userID: email }).toArray();
 
     return notes
         .filter(doc => doc && typeof doc === 'object')

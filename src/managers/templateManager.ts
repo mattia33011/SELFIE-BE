@@ -8,7 +8,8 @@ interface HtmlTemplate {
 }
 
 class TemplateManager {
-    private folderPath: string = "src/templates/"
+    private folderPath: string = path.join(__dirname, "templates") //"src/templates"
+      
   public initTemplate() {
     //TODO
   }
