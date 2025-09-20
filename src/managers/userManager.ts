@@ -119,7 +119,7 @@ class UserManager {
 
   async getUserProfilePicture(userID: string) {
     const user = (await userRepository.read(userID, false, true)) as DBUser;
-    return user.profilePicture;
+    return user?.profilePicture;
   }
 
   async autoSuggestName(partialName: string, userId: string): Promise<string[]> {

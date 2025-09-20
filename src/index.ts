@@ -42,14 +42,15 @@ import {
   autoSuggestUsersCallback,
   updateProjectCallback,
   addProjectTaskCallback,
+  getTodayEventsCallback,
   getToday,
   setToday,
   resetToday,
-  saveNoteCallback
+  saveNoteCallback,
 } from "./callbacks/endpoints";
 import { errorHandler, jwtMiddleWare, logRequest } from "./callbacks/mddleware";
 import multer from "multer";
-import path from 'path';
+import path from "path";
 import emailManager from "./managers/emailManager";
 import templateRepository from "./repositories/templateRepository";
 import templateManager from "./managers/templateManager";
@@ -66,7 +67,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware to log Request
-app.use(logRequest)
+app.use(logRequest);
 
 const port = process.env.PORT ?? 8000;
 
@@ -93,29 +94,49 @@ app.put(
   profilePictureUploadMiddleware
 );
 
-app.get(
-  "/users/:userid/profile-picture",
-  jwtMiddleWare,
-  getProfilePictureCallback
-);
+app.get("/users/:userid/profile-picture", getProfilePictureCallback);
 
 //NOTES
 app.get("/users/:userid/notes", jwtMiddleWare, getNotesCallback);
 app.put("/users/:userid/notes", jwtMiddleWare, putNotesCallback);
 app.delete("/users/:userid/notes/:noteid", jwtMiddleWare, deleteNotesCallback);
-app.patch("/users/:userid/notes/:folderid/:noteid", jwtMiddleWare, moveNotesCallback);
-app.patch("/users/:userid/notes/:noteid", jwtMiddleWare, saveNoteCallback)
+app.patch(
+  "/users/:userid/notes/:folderid/:noteid",
+  jwtMiddleWare,
+  moveNotesCallback
+);
+app.patch("/users/:userid/notes/:noteid", jwtMiddleWare, saveNoteCallback);
 
 //recent notes
 app.get("/users/:userid/notes/recent", jwtMiddleWare, getRecentNotesCallback);
 app.post("/users/:userid/notes/recent", jwtMiddleWare, postRecentNotesCallback);
 
 //POMODORO
-app.get("/users/:userid/pomodoro/pomodoroinfo/:pomodoroid", jwtMiddleWare, getPomodoroCallback );
-app.put("/users/:userid/pomodoro/pomodoroinfo", jwtMiddleWare, postPomodoroCallback);
-app.get("/users/:userid/pomodoro/studyplan", jwtMiddleWare, getStudyPlanCallback);
-app.put("/users/:userid/pomodoro/studyplan", jwtMiddleWare, putStudyPlanCallback);
-app.delete("/users/:userid/pomodoro/studyplan/:planid", jwtMiddleWare, deleteStudyPlanCallback);
+app.get(
+  "/users/:userid/pomodoro/pomodoroinfo/:pomodoroid",
+  jwtMiddleWare,
+  getPomodoroCallback
+);
+app.put(
+  "/users/:userid/pomodoro/pomodoroinfo",
+  jwtMiddleWare,
+  postPomodoroCallback
+);
+app.get(
+  "/users/:userid/pomodoro/studyplan",
+  jwtMiddleWare,
+  getStudyPlanCallback
+);
+app.put(
+  "/users/:userid/pomodoro/studyplan",
+  jwtMiddleWare,
+  putStudyPlanCallback
+);
+app.delete(
+  "/users/:userid/pomodoro/studyplan/:planid",
+  jwtMiddleWare,
+  deleteStudyPlanCallback
+);
 
 //sessioni passate
 app.get(
@@ -146,7 +167,7 @@ app.delete(
 
 //EVENTS
 app.get("/users/:userid/events", jwtMiddleWare, getEventsCallback);
-app.get("/users/:userid/events/today", jwtMiddleWare, getEventsCallback);
+app.get("/users/:userid/events/today", jwtMiddleWare, getTodayEventsCallback);
 app.post("/users/:userid/events", jwtMiddleWare, postEventsCallback);
 app.put("/users/:userid/events/:eventid", jwtMiddleWare, putEventsCallback);
 app.delete(
@@ -174,9 +195,9 @@ app.delete(
 //SUGGEST
 app.post("/users/:userid/search", jwtMiddleWare, autoSuggestUsersCallback);
 
-app.get("/time", getToday)
-app.post("/time", setToday)
-app.post("/time/reset", resetToday)
+app.get("/time", getToday);
+app.post("/time", setToday);
+app.post("/time/reset", resetToday);
 
 // Middleware to catch every unhandled error
 app.use(errorHandler);
@@ -194,9 +215,8 @@ checkDbConnection().then((it) => {
   }
 
   //TODO generate all the email templates
-  templateManager.initTemplateAsync()
-  
-  
+  templateManager.initTemplateAsync();
+
   app.listen(port, () => {
     console.log(`[server]: Server is running at ${port}`);
   });

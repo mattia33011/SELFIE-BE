@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient } from "mongodb";
 
-const connectionUri = "mongodb://site242521:Hich2tho@mongo_site242521:27017/?authMechanism=DEFAULT";  // "mongodb://localhost:27017" 
+const connectionUri = "mongodb://localhost:27017" // "mongodb://site242521:Hich2tho@mongo_site242521:27017/?authMechanism=DEFAULT";  //  
 
 export abstract class Repository {
   protected client: Db;
