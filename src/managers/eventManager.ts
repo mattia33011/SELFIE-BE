@@ -21,9 +21,9 @@ class EventManager {
         rrule: note.rrule,
         allDay: note.allDay,
         extendedProps: {
-          luogo: note.luogo,
-          tipo: note.tipo,
-          stato: note.stato,
+          luogo: note.extendedProps?.luogo,
+          tipo: note.extendedProps?.tipo,
+          stato: note.extendedProps?.stato,
         },
       }));
     });
@@ -40,9 +40,9 @@ class EventManager {
           rrule: event.rrule,
           allDay: event.allDay,
           extendedProps: {
-            luogo: event.luogo,
-            tipo: event.tipo,
-            stato: event.stato,
+            luogo: event.extendedProps?.luogo,
+            tipo: event.extendedProps?.tipo,
+            stato: event.extendedProps?.stato,
           },
         }))
         .filter((it) => {
@@ -54,20 +54,12 @@ class EventManager {
           today.setMinutes(0);
           today.setSeconds(0);
           today.setMilliseconds(0);
-          
-          console.log("start", start);
-          console.log("end", end);
-          console.log("today", today);
+
           if (!start) return false;
 
           if (!end) {
-            console.log("compareDatesByDay", compareDatesByDay(today, start));
             return compareDatesByDay(today, start);
           }
-          console.log(
-            "dateIsBetweenOtherDates",
-            dateIsBetweenOtherDates(today, end, start)
-          );
           return dateIsBetweenOtherDates(today, end, start);
         });
     });

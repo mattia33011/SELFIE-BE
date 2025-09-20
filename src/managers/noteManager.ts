@@ -6,7 +6,6 @@ import { ObjectId } from "mongodb";
 
 class NoteManager {
   private normalizeNote(note: any): Note {
-    console.log("ppp");
     return {
       _id: note._id?.toString(),
       label: note.label,
@@ -18,7 +17,6 @@ class NoteManager {
       droppableNode: note.droppableNode ?? false,
       lastEdit: note.lastEdit ? new Date(note.lastEdit) : new Date(),
       children: note.children?.map((child: any) => {
-        console.log(child);
         return this.normalizeNote(child);
       }),
     };
@@ -71,7 +69,6 @@ class NoteManager {
 
     if (!isSame) note.parent = folder!._id.toString();
     else note.parent = null;
-    console.log(isSame, note);
     const result = await noteRepository.updateNote(note);
 
     return result.acknowledged;
@@ -102,7 +99,6 @@ class NoteManager {
 
   public async fetchRecentNotes(userID: string): Promise<Notes> {
     return noteRepository.readRecentNote(userID).then((notes) => {
-      console.log(notes);
       return notes.map<Note>((note) => ({
         _id: note._id,
         label: note.label,
