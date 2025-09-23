@@ -4,11 +4,11 @@ import {Note} from "../types/event";
 import timeMachine from "../managers/timeMachine";
 
 class NoteRepository extends Repository {
-    private readonly notes: Collection;
+    private readonly notes: Collection<Note>;
 
     constructor() {
         super("notes");
-        this.notes = this.collection
+        this.notes = this.collection as any as Collection<Note>;
     }
 
 async deleteNote(noteID: string, userIdentifier: string): Promise<{ success: boolean, deletedCount: number }> {

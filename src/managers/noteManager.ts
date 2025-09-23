@@ -76,6 +76,11 @@ class NoteManager {
 
   async deleteNote(noteID: string, userIdentifier: string) {
     try {
+      const nota= await noteRepository.collection.findOne({_id: new ObjectId(noteID)}) as Note;
+      if(!nota) throw getSelfieError("404", 404, "Note or folder not found");
+      if(nota.type="folder"){
+        await noteRepository.collection.deleteMany({$and:[{parent: nota._id?.toString()}]});
+      }
       const result = await noteRepository.deleteNote(noteID, userIdentifier);
 
       if (!result.success || result.deletedCount === 0) {
@@ -108,7 +113,7 @@ class NoteManager {
         children: note.children,
         type: note.type,
         parent: note.parent,
-        droppableNode: note.droppableNote,
+        droppableNode: note.droppableNode,
         lastEdit: note.lastEdit,
       }));
     });
