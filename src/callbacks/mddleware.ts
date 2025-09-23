@@ -45,10 +45,13 @@ export const jwtMiddleWare: RequestHandler = async (req, res, next) => {
     401,
     "The subject is not the requester"
   );
-  if (!token || jwtManager.isExpired(token.substring(7))) {
-    logger.error(`JWT expired - Request: ${req.originalUrl}`);
+  if(!token){
     res.status(401).json(error);
     return;
+  }
+  if (jwtManager.isExpired(token.substring(7))) {
+    logger.error(`JWT expired - Request: ${req.originalUrl}`);
+    res.status(401).json({"reason": "expired"})
   }
   const decodedToken = jwtManager.decodeToken(
     req.headers.authorization!.substring(7)

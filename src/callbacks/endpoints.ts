@@ -629,13 +629,14 @@ export const putEventsCallback: RequestHandler = async (req, res, next) => {
   const body = req.body;
 
   if (_id == undefined || !isEvent(body)) {
-    return next(getSelfieError("EVENT_002", 400, "Body is invalid"));
+    return next(getSelfieError("EVENT_002", 400, "Body is invalid" + JSON.stringify(body)));
   }
 
   try {
-    const updatedId = await eventManager.update(_id, email, body);
+    const id = new ObjectId(_id)
+    const updatedId = await eventManager.update(id, email, body);
 
-    res.status(200).send(updatedId);
+    res.status(200).json({_id:updatedId});
   } catch (err) {
     return next(err);
   }

@@ -7,7 +7,13 @@ export  type CalendarEvent = {
   end?: Date | string;
   allDay?: boolean;
   _id: ObjectId;
-  rrule?: any;
+  rrule?:{
+      freq: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY',
+      dtstart: Date,
+      interval?: number,
+      until?: Date,
+      byweekday?: string[],
+  },
   extendedProps?: {
     luogo?: string;
     tipo?: 'attività' | 'evento';
@@ -21,7 +27,7 @@ export function isEvent(event: any): event is CalendarEvent {
     if (event.allDay==true)
         return "title" in event && "color" in event;
     else
-        return "title" in event && "end" in event && "color" in event;
+        return "title" in event && "color" in event;
 }
 
 export function isEventid(event: any): event is CalendarEvent {
