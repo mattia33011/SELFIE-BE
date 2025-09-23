@@ -112,31 +112,11 @@ app.get("/users/:userid/notes/recent", jwtMiddleWare, getRecentNotesCallback);
 app.post("/users/:userid/notes/recent", jwtMiddleWare, postRecentNotesCallback);
 
 //POMODORO
-app.get(
-  "/users/:userid/pomodoro/pomodoroinfo/:pomodoroid",
-  jwtMiddleWare,
-  getPomodoroCallback
-);
-app.put(
-  "/users/:userid/pomodoro/pomodoroinfo",
-  jwtMiddleWare,
-  postPomodoroCallback
-);
-app.get(
-  "/users/:userid/pomodoro/studyplan",
-  jwtMiddleWare,
-  getStudyPlanCallback
-);
-app.put(
-  "/users/:userid/pomodoro/studyplan",
-  jwtMiddleWare,
-  putStudyPlanCallback
-);
-app.delete(
-  "/users/:userid/pomodoro/studyplan/:planid",
-  jwtMiddleWare,
-  deleteStudyPlanCallback
-);
+app.get("/users/:userid/pomodoro/pomodoroinfo/:pomodoroid", jwtMiddleWare, getPomodoroCallback);
+app.put("/users/:userid/pomodoro/pomodoroinfo", jwtMiddleWare, postPomodoroCallback);
+app.get("/users/:userid/pomodoro/studyplan", jwtMiddleWare, getStudyPlanCallback);
+app.put("/users/:userid/pomodoro/studyplan", jwtMiddleWare, putStudyPlanCallback);
+app.delete("/users/:userid/pomodoro/studyplan/:planid", jwtMiddleWare, deleteStudyPlanCallback);
 
 //sessioni passate
 app.get(
