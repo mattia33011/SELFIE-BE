@@ -7,7 +7,7 @@ export  type CalendarEvent = {
   end?: Date | string;
   allDay?: boolean;
   _id: ObjectId;
-  rrule: any;
+  rrule?: any;
   extendedProps?: {
     luogo?: string;
     tipo?: 'attività' | 'evento';
