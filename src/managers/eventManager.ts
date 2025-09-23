@@ -95,7 +95,7 @@ class EventManager {
       .then((it) => it.acknowledged);
   }
   public async update(
-    eventID: string,
+    eventID: ObjectId,
     userID: string,
     event: CalendarEvent
   ): Promise<ObjectId | null> {
